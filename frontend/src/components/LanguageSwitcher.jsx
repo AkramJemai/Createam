@@ -1,0 +1,124 @@
+import { useEffect, useState } from 'react';
+
+const GOOGLE_SCRIPT_SRC = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+
+function getSavedLanguage() {
+  const stored = localStorage.getItem('site_lang');
+  if (stored === 'en' || stored === 'fr') return stored;
+
+  const cookie = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('googtrans='));
+
+  if (!cookie) return 'en';
+
+  const value = decodeURIComponent(cookie.split('=')[1] || '');
+  if (value.endsWith('/fr')) return 'fr';
+  return 'en';
+}
+
+function setGoogleTranslateCookie(lang) {
+  const cookieValue = lang === 'fr' ? '/auto/fr' : '/auto/en';
+  document.cookie = `googtrans=${cookieValue};path=/`;
+}
+
+function hideGoogleChrome() {
+  const selectors = [
+    '.goog-te-banner-frame',
+    'iframe.goog-te-banner-frame',
+    '.skiptranslate',
+    'body > iframe.skiptranslate',
+    '.VIpgJd-ZVi9od-ORHb',
+    '.goog-te-balloon-frame',
+    '#goog-gt-tt'
+  ];
+
+  selectors.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((node) => {
+      node.style.setProperty('display', 'none', 'important');
+      node.style.setProperty('visibility', 'hidden', 'important');
+    });
+  });
+
+  document.body.style.setProperty('top', '0px', 'important');
+  document.documentElement.style.setProperty('top', '0px', 'important');
+  document.documentElement.style.setProperty('margin-top', '0px', 'important');
+}
+
+export default function LanguageSwitcher() {
+  const [currentLanguage, setCurrentLanguage] = useState('en');
+
+  useEffect(() => {
+    setCurrentLanguage(getSavedLanguage());
+
+    if (!document.getElementById('google_translate_element')) {
+      const holder = document.createElement('div');
+      holder.id = 'google_translate_element';
+      document.body.appendChild(holder);
+    }
+
+    window.googleTranslateElementInit = () => {
+      if (!window.google?.translate?.TranslateElement) return;
+
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: 'en',
+          includedLanguages: 'en,fr',
+          autoDisplay: false,
+        },
+        'google_translate_element'
+      );
+    };
+
+    const alreadyLoaded = document.querySelector(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
+    if (!alreadyLoaded) {
+      const script = document.createElement('script');
+      script.src = GOOGLE_SCRIPT_SRC;
+      script.async = true;
+      document.body.appendChild(script);
+    } else if (window.google?.translate?.TranslateElement && window.googleTranslateElementInit) {
+      window.googleTranslateElementInit();
+    }
+
+    hideGoogleChrome();
+    const observer = new MutationObserver(hideGoogleChrome);
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  const handleLanguageChange = (lang) => {
+    if (lang === currentLanguage) return;
+
+    localStorage.setItem('site_lang', lang);
+    setGoogleTranslateCookie(lang);
+    setCurrentLanguage(lang);
+    window.location.reload();
+  };
+
+  const buttonStyle = (lang) => ({
+    border: '1px solid rgba(0,0,0,0.1)',
+    background: currentLanguage === lang ? 'var(--primary)' : 'rgba(255,255,255,0.8)',
+    color: currentLanguage === lang ? '#fff' : 'var(--text)',
+    padding: '7px 10px',
+    borderRadius: '999px',
+    fontSize: '11px',
+    fontWeight: 800,
+    letterSpacing: '0.8px',
+    cursor: 'pointer',
+    transition: 'var(--transition-smooth)'
+  });
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }} aria-label="Language switcher">
+      <button type="button" style={buttonStyle('en')} onClick={() => handleLanguageChange('en')}>
+        EN
+      </button>
+      <button type="button" style={buttonStyle('fr')} onClick={() => handleLanguageChange('fr')}>
+        FR
+      </button>
+    </div>
+  );
+}

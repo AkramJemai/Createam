@@ -1,0 +1,103 @@
+<?php
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\PartnershipController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\MeetingController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\AgencyController;
+use App\Http\Controllers\ClientController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/partnerships', [PartnershipController::class, 'getAllPartnerships']);
+Route::get('/partnerships/nearby', [PartnershipController::class, 'getNearbyPartnerships']);
+Route::get('/partnerships/{partnership}', [PartnershipController::class, 'getPartnershipById']);
+Route::get('/clients/{client}/partnerships', [PartnershipController::class, 'getPartnershipsByClient']);
+Route::post('/partnerships/{partnership}/click', [PartnershipController::class, 'trackPartnershipClick']);
+Route::get('/jobs/titles', [JobController::class, 'getAllJobTitles']);
+Route::get('/partnership-categories', [PartnershipController::class, 'getAllCategories']);
+Route::get('/agency', [AgencyController::class, 'getAgencyData']);
+Route::get('/clients', [ClientController::class, 'getAllClients']);
+
+Route::post('/contact', [ContactController::class, 'createContact']);
+
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/forgot-password', [\App\Http\Controllers\PasswordResetController::class, 'sendPasswordResetLink']);
+Route::post('/reset-password', [\App\Http\Controllers\PasswordResetController::class, 'resetPassword']);
+
+Route::get('/invite/validate/{token}', [InvitationController::class, 'validateInvitationToken']);
+Route::post('/invite/accept', [InvitationController::class, 'acceptInvitation']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::get('/notifications', [NotificationController::class, 'getMyNotifications']);
+    Route::put('/notifications/{notification}/read', [NotificationController::class, 'markNotificationAsRead']);
+    Route::put('/notifications/read-all', [NotificationController::class, 'markAllNotificationsAsRead']);
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'deleteNotification']);
+
+    Route::get('/partnerships/trending/top-3-months', [PartnershipController::class, 'getTopClickedPartnershipsInPeriod'])
+        ->middleware('role:admin');
+
+    Route::get('/tasks', [TaskController::class, 'getAllTasks']);
+    Route::post('/tasks', [TaskController::class, 'createTask']);
+    Route::get('/tasks/{task}', [TaskController::class, 'getTaskById']);
+    Route::put('/tasks/{task}', [TaskController::class, 'updateTask']);
+    Route::delete('/tasks/{task}', [TaskController::class, 'deleteTask']);
+
+    Route::middleware('role:admin,chef')->group(function () {
+        Route::post('/invite', [InvitationController::class, 'sendInvitation']);
+
+        Route::post('/partnerships', [PartnershipController::class, 'createPartnership']);
+        Route::put('/partnerships/{partnership}', [PartnershipController::class, 'updatePartnership']);
+        Route::delete('/partnerships/{partnership}', [PartnershipController::class, 'deletePartnership']);
+
+        Route::get('/contacts', [ContactController::class, 'getAllContacts']);
+        Route::put('/contacts/{contact}', [ContactController::class, 'updateContactStatus']);
+        Route::delete('/contacts/{contact}', [ContactController::class, 'deleteContact']);
+
+        Route::get('/invitations', [InvitationController::class, 'getAllInvitations']);
+        Route::delete('/invitations/{invitation}', [InvitationController::class, 'deleteInvitation']);
+
+        Route::get('/members', [UserController::class, 'getAllUsers']);
+        Route::delete('/members/{user}', [UserController::class, 'deleteUser']);
+
+        Route::get('/meetings', [MeetingController::class, 'getAllMeetings']);
+        Route::post('/meetings', [MeetingController::class, 'createMeeting']);
+        Route::get('/meetings/{meeting}', [MeetingController::class, 'getMeetingById']);
+        Route::put('/meetings/{meeting}', [MeetingController::class, 'updateMeeting']);
+        Route::delete('/meetings/{meeting}', [MeetingController::class, 'deleteMeeting']);
+
+        Route::post('/jobs/titles', [JobController::class, 'createJobTitle']);
+        Route::put('/jobs/titles/{jobTitle}', [JobController::class, 'updateJobTitle']);
+        Route::delete('/jobs/titles/{jobTitle}', [JobController::class, 'deleteJobTitle']);
+
+        Route::post('/partnership-categories', [PartnershipController::class, 'createCategory']);
+        Route::put('/partnership-categories/{category}', [PartnershipController::class, 'updateCategory']);
+        Route::delete('/partnership-categories/{category}', [PartnershipController::class, 'deleteCategory']);
+
+        Route::put('/agency/info', [AgencyController::class, 'updateAgencyInfo']);
+        Route::post('/agency/stats', [AgencyController::class, 'createAgencyStat']);
+        Route::delete('/agency/stats/{stat}', [AgencyController::class, 'deleteAgencyStat']);
+        Route::post('/agency/timeline', [AgencyController::class, 'createAgencyTimeline']);
+        Route::delete('/agency/timeline/{timeline}', [AgencyController::class, 'deleteAgencyTimeline']);
+        Route::post('/agency/team', [AgencyController::class, 'createAgencyTeamMember']);
+        Route::delete('/agency/team/{member}', [AgencyController::class, 'deleteAgencyTeamMember']);
+
+        Route::post('/clients', [ClientController::class, 'createClient']);
+        Route::put('/clients/{client}', [ClientController::class, 'updateClient']);
+        Route::delete('/clients/{client}', [ClientController::class, 'deleteClient']);
+    });
+
+    Route::post('/ai/generate-prompt', [\App\Http\Controllers\AIController::class, 'generatePrompt']);
+    Route::post('/ai/summarize-nearby', [\App\Http\Controllers\AIController::class, 'summarizeNearby']);
+});
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});

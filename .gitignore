@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment
+.env
+.env.backup
+*.env.local
+
+# Laravel
+backend/storage/logs/
+backend/storage/framework/cache/
+backend/storage/framework/sessions/
+backend/storage/framework/views/
+backend/bootstrap/cache/
+backend/database/database.sqlite
+backend/.phpunit.result.cache
+
+# Build output
+frontend/build/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

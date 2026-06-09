@@ -1,0 +1,81 @@
+import React from 'react';
+import {
+    Briefcase,
+    Calendar,
+    Users,
+    ChevronLeft,
+    ChevronRight
+} from 'lucide-react';
+
+export default function ChefSidebar({ activeTab, setActiveTab, handleLogout, roleColor, isCollapsed, setIsCollapsed }) {
+    const sidebarItems = [
+        { id: 'projects', label: 'My Projects', icon: Briefcase },
+        { id: 'meetings', label: 'Meetings', icon: Calendar },
+        { id: 'team', label: 'Team Members', icon: Users }
+    ];
+
+    return (
+        <aside className={`dashboard-sidebar ${isCollapsed ? 'collapsed' : ''}`} style={{ position: 'relative' }}>
+            <div style={{ marginBottom: '40px', display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: '38px',
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    background: '#fff',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                    boxShadow: '0 8px 20px rgba(0,0,0,0.08)'
+                }}>
+                    <img src="/logo.jpg" alt="Createam" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </span>
+                <div style={{ opacity: isCollapsed ? 0 : 1, transition: 'opacity 0.2s' }}>
+                    <p className="label" style={{ color: roleColor, margin: 0 }}>Project Manager</p>
+                    <h2 className="notranslate" translate="no" style={{ fontSize: '1.2rem', margin: 0, fontWeight: '800' }}>
+                        Createam<span style={{ color: 'var(--accent)' }}>.</span>
+                    </h2>
+                </div>
+            </div>
+
+            <nav className="sidebar-nav">
+                {sidebarItems.map(item => (
+                    <button
+                        key={item.id}
+                        onClick={() => setActiveTab(item.id)}
+                        className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
+                        title={isCollapsed ? item.label : ''}
+                    >
+                        <item.icon size={20} />
+                        <span style={{ display: isCollapsed ? 'none' : 'block' }}>{item.label}</span>
+                    </button>
+                ))}
+            </nav>
+
+            <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                style={{
+                    position: 'absolute',
+                    bottom: '20px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--muted)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.03)'
+                }}
+            >
+                {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </button>
+        </aside>
+    );
+}

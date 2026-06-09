@@ -1,0 +1,65 @@
+@startuml Task_Creation_Sequence
+!theme plain
+skinparam sequence {
+    ArrowColor #333333
+    ActorBackgroundColor #FFFFFF
+    ActorBorderColor #333333
+    ParticipantBackgroundColor #E1F5FF
+    ParticipantBorderColor #01579B
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #333333
+}
+
+actor "Admin User" as Admin
+participant "React UI" as UI
+participant "TaskController" as TaskCtrl
+database "MySQL DB" as DB
+participant "Notification\nService" as NotifSvc
+actor "Assigned\nMember" as Member
+
+Admin -> UI: Create task dialog opened
+activate UI
+
+UI -> TaskCtrl: POST /api/tasks\n{title, description, assignee_id, priority}
+activate TaskCtrl
+
+TaskCtrl -> TaskCtrl: Validate request data\n(required fields, user permissions)
+alt Validation Error
+    TaskCtrl -> UI: 422 Unprocessable Entity\n{errors: {...}}
+    deactivate TaskCtrl
+    UI -> Admin: Display validation errors
+    deactivate UI
+else Validation Success
+    TaskCtrl -> DB: BEGIN TRANSACTION\nINSERT tasks table
+    activate DB
+    DB -> DB: Generate task_id\nSet status = 'assigned'
+    DB -> TaskCtrl: task_id, created_at
+    deactivate DB
+
+    TaskCtrl -> TaskCtrl: Prepare notification payload\n{task_id, assigned_to, title}
+
+    TaskCtrl -> NotifSvc: POST /notify\n(async trigger)
+    activate NotifSvc
+
+    TaskCtrl -> UI: 201 Created\n{id, title, assignee, status, created_at}
+    deactivate TaskCtrl
+
+    UI -> Admin: Show success toast\n"Task created successfully"
+    deactivate UI
+
+    par Real-time Notification
+        NotifSvc -> DB: INSERT notifications table\n{member_id, task_id, type: 'assigned'}
+        activate DB
+        DB -> NotifSvc: notification_id
+        deactivate DB
+
+        NotifSvc -> Member: WebSocket/SSE event\n"Task assigned to you"
+        activate Member
+    end
+
+    Member -> Member: Receive real-time alert
+    Member -> UI: Task appears in Kanban\nboard (assigned column)
+    deactivate Member
+    deactivate NotifSvc
+end
+@enduml

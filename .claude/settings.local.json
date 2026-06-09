@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ollama list:*)",
+      "Bash(ollama pull:*)",
+      "Bash(node:*)",
+      "Bash(dir /b /s \"Z:\\\\createam-agency\\\\createam\\\\*.md\")",
+      "Bash(findstr /i /v \"node_modules\")",
+      "Bash(findstr /i /v \"vendor\")",
+      "Bash(ls *.md)",
+      "Bash(dir *.md)",
+      "Bash(dir \"Z:\\\\createam-agency\\\\createam\")",
+      "Bash(php -l app/Http/Controllers/AuthController.php)",
+      "Bash(php -l app/Models/User.php)",
+      "Bash(php artisan:*)",
+      "Bash(npm list *)",
+      "Bash(cd /tmp)",
+      "Bash(npm install *)",
+      "Bash(npx mmdc *)",
+      "Bash(awk 'NR>=605 && NR<=652' \"Z:/createam-agency/createam/frontend/src/components/chef/ChefDashboard.jsx\")"
+    ]
+  }
+}

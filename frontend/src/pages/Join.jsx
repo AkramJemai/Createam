@@ -1,0 +1,206 @@
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { validateInvitation, acceptInvitation } from '../services/api';
+
+export default function Join() {
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get('token');
+    const navigate = useNavigate();
+
+    const [invitation, setInvitation] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [form, setForm] = useState({
+        name: '',
+        password: '',
+        password_confirmation: ''
+    });
+
+    useEffect(() => {
+        if (!token) {
+            setError('No invitation token found.');
+            setLoading(false);
+            return;
+        }
+
+        const checkToken = async () => {
+            const data = await validateInvitation(token);
+            if (data) {
+                setInvitation(data);
+            } else {
+                setError('This invitation is invalid or has expired.');
+            }
+            setLoading(false);
+        };
+
+        checkToken();
+    }, [token]);
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        if (form.password !== form.password_confirmation) {
+            setError('Passwords do not match.');
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            const result = await acceptInvitation({
+                token,
+                name: form.name,
+                password: form.password,
+                password_confirmation: form.password_confirmation
+            });
+
+            // Store user and token in localStorage for persistence
+            localStorage.setItem('token', result.token);
+            localStorage.setItem('user', JSON.stringify(result.user));
+
+            navigate(result.user.role === 'admin' ? '/admin' : '/login');
+        } catch (err) {
+            setError(err.message || 'Something went wrong.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    if (loading) return (
+        <div className="container section" style={{ textAlign: 'center', paddingTop: '100px' }}>
+            <p className="label animate-pulse">Security Protocol</p>
+            <h1 style={{ fontSize: '2rem' }}>Verifying Invitation...</h1>
+        </div>
+    );
+
+    if (error) {
+        return (
+            <div className="container section" style={{ maxWidth: '450px', paddingTop: '100px' }}>
+                <div className="card" style={{ textAlign: 'center', padding: '40px', borderTop: '4px solid var(--primary)' }}>
+                    <h2 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>Access Denied<span style={{ color: 'var(--primary)' }}>.</span></h2>
+                    <p style={{ marginBottom: '30px' }}>{error}</p>
+                    <Link to="/" className="btn" style={{ width: '100%' }}>Return to Terminal</Link>
+                </div>
+            </div>
+        );
+    }
+
+    const roleColor = invitation.role === 'admin' ? 'var(--role-admin)' :
+        invitation.role === 'chef' ? 'var(--role-chef)' :
+            'var(--role-member)';
+
+    return (
+        <div className="container section" style={{ maxWidth: '450px' }}>
+            <header style={{ textAlign: 'center', marginBottom: '40px' }} className="animate-fade-in">
+                <p className="label" style={{ color: roleColor }}>Member Onboarding</p>
+                <h1 style={{ fontSize: '3rem' }}>
+                    Join<span style={{ color: roleColor }}>.</span>
+                </h1>
+                <p style={{ fontSize: '14px', color: '#999' }}>
+                    Authorized as <strong>{invitation.role === 'chef' ? 'Project Lead' : invitation.role === 'member' ? 'Team Member' : 'System Admin'}</strong>
+                    {invitation.job_title && <span> — <em>{invitation.job_title}</em></span>}
+                </p>
+            </header>
+
+            <form
+                onSubmit={handleSubmit}
+                className="card animate-slide-up"
+                style={{
+                    padding: '40px',
+                    boxShadow: `0 10px 40px -10px ${roleColor}22`,
+                    borderTop: `4px solid ${roleColor}`,
+                    transition: 'all 0.4s ease'
+                }}
+            >
+                <div style={{ marginBottom: '25px' }}>
+                    <label className="label" style={{ color: roleColor }}>Full Identity Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        placeholder="Enter Your Name"
+                        style={{
+                            width: '100%',
+                            padding: '15px',
+                            marginTop: '10px',
+                            border: '1px solid #eee',
+                            borderRadius: '4px',
+                            outline: 'none'
+                        }}
+                        required
+                    />
+                </div>
+
+                <div style={{ marginBottom: '25px' }}>
+                    <label className="label" style={{ color: roleColor }}>Security Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={form.password}
+                        onChange={handleChange}
+                        placeholder="Enter Your Password"
+                        style={{
+                            width: '100%',
+                            padding: '15px',
+                            marginTop: '10px',
+                            border: '1px solid #eee',
+                            borderRadius: '4px',
+                            outline: 'none'
+                        }}
+                        required
+                    />
+                </div>
+
+                <div style={{ marginBottom: '35px' }}>
+                    <label className="label" style={{ color: roleColor }}>Confirm credentials</label>
+                    <input
+                        type="password"
+                        name="password_confirmation"
+                        value={form.password_confirmation}
+                        onChange={handleChange}
+                        placeholder="Repeat password"
+                        style={{
+                            width: '100%',
+                            padding: '15px',
+                            marginTop: '10px',
+                            border: '1px solid #eee',
+                            borderRadius: '4px',
+                            outline: 'none'
+                        }}
+                        required
+                    />
+                    {error && <p style={{ color: 'var(--primary)', fontSize: '12px', marginTop: '10px' }}>{error}</p>}
+                </div>
+
+                <button
+                    type="submit"
+                    className="btn"
+                    disabled={submitting}
+                    style={{
+                        width: '100%',
+                        padding: '18px',
+                        background: roleColor,
+                        fontSize: '16px',
+                        boxShadow: `0 4px 14px 0 ${roleColor}33`
+                    }}
+                >
+                    {submitting ? 'Initializing Workspace...' : 'Activate Account'}
+                </button>
+
+                <p style={{ marginTop: '25px', textAlign: 'center', fontSize: '12px', color: '#ccc' }}>
+                    REGISTERING AS: {invitation.email}
+                </p>
+            </form>
+
+            <footer style={{ marginTop: '40px', textAlign: 'center', color: '#ccc', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px' }}>
+                <span className="notranslate" translate="no">Createam Agency</span> &copy; 2026
+            </footer>
+        </div>
+    );
+}

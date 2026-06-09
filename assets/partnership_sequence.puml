@@ -1,0 +1,93 @@
+@startuml Partnership_Click_Tracking_Sequence
+!theme plain
+skinparam sequence {
+    ArrowColor #333333
+    ActorBackgroundColor #FFFFFF
+    ActorBorderColor #333333
+    ParticipantBackgroundColor #E8F5E9
+    ParticipantBorderColor #1B5E20
+    LifeLineBackgroundColor #FFFFFF
+    LifeLineBorderColor #333333
+}
+
+actor "Admin" as Admin
+participant "Admin Panel\nReact" as AdminUI
+participant "PartnershipController" as PartCtrl
+participant "File Storage\nService" as Storage
+database "MySQL DB" as DB
+actor "Public User" as PublicUser
+participant "Public Portfolio" as Portfolio
+participant "Analytics\nService" as Analytics
+
+Admin -> AdminUI: Open partnership form
+activate AdminUI
+
+Admin -> AdminUI: Upload logo file & enter\npartnership details\n(name, url, category, description)
+
+AdminUI -> PartCtrl: POST /api/partnerships\n(multipart form-data)\n{logo, name, url, category}
+activate PartCtrl
+
+PartCtrl -> PartCtrl: Validate partnership data\n& logo file type/size
+alt Validation Error
+    PartCtrl -> AdminUI: 422 Unprocessable Entity\n{errors: [...]}
+    deactivate PartCtrl
+    AdminUI -> Admin: Display error message
+    deactivate AdminUI
+else Validation Success
+    PartCtrl -> Storage: POST /store-file\n(logo file bytes)
+    activate Storage
+    Storage -> Storage: Generate unique filename\nwith hash (logo_xxxxx.webp)
+    Storage -> Storage: Store in public/partnerships/
+    Storage -> PartCtrl: file_path, file_url, size
+    deactivate Storage
+
+    PartCtrl -> DB: BEGIN TRANSACTION\nINSERT partnerships table
+    activate DB
+    DB -> DB: partnership_id, created_at\nlogo_path, click_count=0, status='published'
+    DB -> PartCtrl: partnership_id, logo_url
+    deactivate DB
+
+    PartCtrl -> AdminUI: 201 Created\n{id, name, logo_url, status, created_at}
+    deactivate PartCtrl
+
+    AdminUI -> Admin: Show success\n"Partnership published"
+    deactivate AdminUI
+end
+
+note over PublicUser,Portfolio: Time passes... Users browse portfolio
+
+PublicUser -> Portfolio: Visit /portfolio or /partnerships
+activate Portfolio
+Portfolio -> DB: GET SELECT partnerships\nWHERE status='published'
+activate DB
+DB -> Portfolio: Return partnerships with logos
+deactivate DB
+
+Portfolio -> PublicUser: Render partnerships list\nwith logos and links
+deactivate Portfolio
+
+PublicUser -> PartCtrl: POST /api/partnerships/{id}/click\n{partnership_id, timestamp, ip_address}
+activate PartCtrl
+
+PartCtrl -> DB: INSERT partnership_clicks table\n{partnership_id, user_ip, clicked_at, user_agent}
+activate DB
+DB -> DB: Generate click_id, commit transaction
+DB -> PartCtrl: click_id, timestamp
+deactivate DB
+
+PartCtrl -> Analytics: POST /log-click (async)\n(click event payload)
+activate Analytics
+par Analytics Update
+    Analytics -> DB: UPDATE partnerships\nSET click_count = click_count + 1\nWHERE id = partnership_id
+    activate DB
+    DB -> Analytics: Updated count
+    deactivate DB
+
+    Analytics -> Analytics: Increment analytics metrics\n(daily clicks, total clicks)
+end
+
+PartCtrl -> Portfolio: 200 OK\n{click_tracked: true, click_timestamp}
+deactivate PartCtrl
+deactivate Analytics
+deactivate Portfolio
+@enduml
