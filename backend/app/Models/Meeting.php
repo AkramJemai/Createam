@@ -15,8 +15,18 @@ class Meeting extends Model
         'meeting_date',
         'notes',
         'chef_id',
-        'created_by'
+        'created_by',
+        'is_project'
     ];
+
+    protected $casts = [
+        'is_project' => 'boolean',
+    ];
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
 
     public function chef()
     {

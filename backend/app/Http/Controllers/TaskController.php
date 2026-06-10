@@ -12,10 +12,10 @@ class TaskController extends Controller
 {
     public function getAllTasks(Request $request)
     {
-        $query = Task::with(['partnership', 'assigned_user']);
+        $query = Task::with(['meeting', 'assigned_user']);
 
-        if ($request->has('partnership_id')) {
-            $query->where('partnership_id', $request->partnership_id);
+        if ($request->has('meeting_id')) {
+            $query->where('meeting_id', $request->meeting_id);
         }
 
         if ($request->has('user_id')) {
@@ -34,7 +34,7 @@ class TaskController extends Controller
         }
 
         $validated = $request->validate([
-            'partnership_id' => 'required|exists:partnerships,id',
+            'meeting_id' => 'required|exists:meetings,id',
             'assigned_to' => 'required|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -45,24 +45,25 @@ class TaskController extends Controller
         ]);
 
         $task = Task::create($validated);
+        $task->load('meeting');
 
         Notification::create([
             'user_id' => $task->assigned_to,
             'title' => 'New Task Assigned',
-            'message' => "You have been assigned a new task: {$task->title} in Project: {$task->partnership->title}",
+            'message' => "You have been assigned a new task: {$task->title} in Project: {$task->meeting->title}",
             'type' => 'task_assigned',
             'data' => [
                 'task_id' => $task->id,
-                'project_id' => $task->partnership_id
+                'project_id' => $task->meeting_id
             ]
         ]);
 
-        return response()->json($task->load(['partnership', 'assigned_user']), 201);
+        return response()->json($task->load(['meeting', 'assigned_user']), 201);
     }
 
     public function getTaskById(Task $task)
     {
-        return response()->json($task->load(['partnership', 'assigned_user']));
+        return response()->json($task->load(['meeting', 'assigned_user']));
     }
 
     public function updateTask(Request $request, Task $task)
@@ -88,28 +89,29 @@ class TaskController extends Controller
         $task->update($validated);
 
         if ($task->status === 'done') {
-            $remainingTasks = Task::where('partnership_id', $task->partnership_id)
+            $remainingTasks = Task::where('meeting_id', $task->meeting_id)
                 ->where('status', '!=', 'done')
                 ->count();
 
             if ($remainingTasks === 0) {
+                $task->load('meeting');
                 $admins = User::where('role', 'admin')->get();
                 foreach ($admins as $admin) {
                     Notification::create([
                         'user_id' => $admin->id,
                         'title' => 'Project Ready for Posting',
-                        'message' => "All production tasks for Project: {$task->partnership->title} have been completed. You can now finalize and post the project.",
+                        'message' => "All production tasks for Project: {$task->meeting->title} have been completed.",
                         'type' => 'project_complete',
                         'data' => [
-                            'project_id' => $task->partnership_id,
-                            'project_title' => $task->partnership->title
+                            'project_id' => $task->meeting_id,
+                            'project_title' => $task->meeting->title
                         ]
                     ]);
                 }
             }
         }
 
-        return response()->json($task->load(['partnership', 'assigned_user']));
+        return response()->json($task->load(['meeting', 'assigned_user']));
     }
 
     public function deleteTask(Task $task)

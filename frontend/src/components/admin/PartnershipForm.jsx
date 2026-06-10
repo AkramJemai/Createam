@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Rocket, X, Check, Trash2 } from 'lucide-react';
+import { Rocket, X, Check } from 'lucide-react';
 import * as api from '../../services/api';
 
 export default function PartnershipForm({ formData, setFormData, handleSave, setShowForm, editItem, roleColor }) {
     const [partnershipCategories, setPartnershipCategories] = useState([]);
     const [clients, setClients] = useState([]);
-
     const [error, setError] = useState('');
+    const [newFiles, setNewFiles] = useState([]);
+    const [removedMediaIndices, setRemovedMediaIndices] = useState([]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -20,20 +21,52 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
         loadData();
     }, []);
 
+    const handleMediaChange = (e) => {
+        const files = Array.from(e.target.files);
+        const mapped = files.map(file => ({
+            file,
+            preview: URL.createObjectURL(file),
+            type: file.type.startsWith('video/') ? 'video' : 'image'
+        }));
+        setNewFiles(prev => [...prev, ...mapped]);
+        e.target.value = '';
+    };
+
+    const removeNewFile = (index) => {
+        setNewFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validation: At least one media item must be present
-        const hasImg = formData.img || (editItem && !formData.removeImg);
-        const hasVideo = formData.video || (editItem && !formData.removeVideo);
+        const images = newFiles.filter(f => f.type === 'image');
+        const videos = newFiles.filter(f => f.type === 'video');
 
-        if (!hasImg && !hasVideo) {
-            setError('Please upload at least one media item (Project Showcase Image or Video).');
+        const existingImg = editItem && formData.img && !formData.removeImg;
+        const existingVideo = editItem && formData.video && !formData.removeVideo;
+
+        const willHaveImg = images.length > 0 || existingImg;
+        const willHaveVideo = videos.length > 0 || existingVideo;
+
+        if (!willHaveImg && !willHaveVideo) {
+            setError('Please upload at least one image or video.');
             return;
         }
 
+        const payload = { ...formData };
+
+        if (existingImg) {
+            if (images.length > 0) payload.media = images.map(f => f.file);
+        } else {
+            if (images[0]) payload.img = images[0].file;
+            if (images.length > 1) payload.media = images.slice(1).map(f => f.file);
+        }
+
+        if (videos[0]) payload.video = videos[0].file;
+        if (removedMediaIndices.length > 0) payload.removeMedia = removedMediaIndices;
+
         setError('');
-        handleSave(e);
+        handleSave(e, payload);
     };
 
     return (
@@ -90,16 +123,6 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
                     </select>
                 </div>
                 <div className="flex-column">
-                    <label className="label">Industry Tags</label>
-                    <input
-                        className="input-field"
-                        placeholder="Tech, Fashion, Crypto..."
-                        required
-                        value={formData.tags || ''}
-                        onChange={e => setFormData({ ...formData, tags: e.target.value })}
-                    />
-                </div>
-                <div className="flex-column">
                     <label className="label">Completion Year</label>
                     <input
                         className="input-field"
@@ -120,93 +143,76 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
                         onChange={e => setFormData({ ...formData, description: e.target.value })}
                     />
                 </div>
-                <div className="flex-column" style={{ gridColumn: 'span 2' }}>
-                    <label className="label">Project Showcase Image (Obligatory if no video)</label>
-                    {editItem && formData.img && typeof formData.img === 'string' && (
-                        <div style={{ marginBottom: '15px' }}>
-                            <div style={{ marginBottom: '10px' }}>
-                                <img src={formData.img} alt="Current" style={{ maxWidth: '200px', maxHeight: '150px', borderRadius: '4px' }} />
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, img: null, removeImg: true })}
-                                style={{
-                                    padding: '6px 12px',
-                                    background: '#dc3545',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.9rem'
-                                }}
-                            >
-                                <Trash2 size={14} /> Remove Image
-                            </button>
-                        </div>
-                    )}
-                    <input
-                        className="input-field"
-                        type="file"
-                        accept="image/*"
-                        required={false}
-                        onChange={e => setFormData({ ...formData, img: e.target.files[0], removeImg: false })}
-                    />
-                    {editItem && <p style={{ fontSize: '0.8rem', marginTop: '5px' }}>Leave empty to keep existing artwork.</p>}
-                </div>
 
                 <div className="flex-column" style={{ gridColumn: 'span 2' }}>
-                    <label className="label">Additional Project Media (Optional)</label>
-                    <input
-                        className="input-field"
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={e => setFormData({ ...formData, media: e.target.files })}
-                    />
-                    {editItem && formData.media && Array.isArray(formData.media) && (
-                        <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
-                            {formData.media.map((url, index) => (
-                                <img key={index} src={url} alt={`Media ${index + 1}`} style={{ height: '60px', borderRadius: '4px' }} />
+                    <label className="label">Project Media</label>
+                    <p style={{ fontSize: '0.8rem', color: '#999', margin: '4px 0 12px' }}>
+                        Select multiple images and/or videos. First image = cover, first video = featured.
+                    </p>
+
+                    {editItem && (formData.img || formData.video || formData.media?.length > 0) && (
+                        <div style={{ marginBottom: '15px' }}>
+                            <p style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '8px', color: '#555' }}>Current media:</p>
+                            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                {formData.img && !formData.removeImg && (
+                                    <div style={{ position: 'relative' }}>
+                                        <img src={formData.img} alt="cover" style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                                        <button type="button" onClick={() => setFormData({ ...formData, img: null, removeImg: true })}
+                                            style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '14px', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                                        <p style={{ fontSize: '0.6rem', color: '#888', textAlign: 'center', margin: '2px 0 0' }}>Cover</p>
+                                    </div>
+                                )}
+                                {formData.video && !formData.removeVideo && (
+                                    <div style={{ position: 'relative' }}>
+                                        <div style={{ background: '#111', borderRadius: '6px', width: '80px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <span style={{ color: 'white', fontSize: '0.65rem' }}>▶ Video</span>
+                                        </div>
+                                        <button type="button" onClick={() => setFormData({ ...formData, video: null, removeVideo: true })}
+                                            style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '14px', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                                    </div>
+                                )}
+                                {(formData.media || []).map((item, i) => (
+                                    !removedMediaIndices.includes(i) && (
+                                        <div key={i} style={{ position: 'relative' }}>
+                                            <img src={item.url || item} alt="" style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                                            <button type="button" onClick={() => setRemovedMediaIndices(prev => [...prev, i])}
+                                                style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '14px', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                                        </div>
+                                    )
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {newFiles.length > 0 && (
+                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px' }}>
+                            {newFiles.map((item, index) => (
+                                <div key={index} style={{ position: 'relative' }}>
+                                    {item.type === 'image'
+                                        ? <img src={item.preview} alt="" style={{ width: '80px', height: '60px', objectFit: 'cover', borderRadius: '6px' }} />
+                                        : <div style={{ width: '80px', height: '60px', background: '#111', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px' }}>
+                                            <span style={{ color: 'white', fontSize: '0.6rem', textAlign: 'center', wordBreak: 'break-all' }}>{item.file.name}</span>
+                                          </div>
+                                    }
+                                    <button type="button" onClick={() => removeNewFile(index)}
+                                        style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '14px', lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        ×
+                                    </button>
+                                </div>
                             ))}
                         </div>
                     )}
-                </div>
 
-                <div className="flex-column" style={{ gridColumn: 'span 2' }}>
-                    <label className="label">Project Showcase Video (Obligatory if no image)</label>
-                    {editItem && formData.video && typeof formData.video === 'string' && (
-                        <div style={{ marginBottom: '15px' }}>
-                            <div style={{ marginBottom: '10px' }}>
-                                <video width="200" height="150" style={{ borderRadius: '4px', backgroundColor: '#f0f0f0' }} controls>
-                                    <source src={formData.video} />
-                                    Your browser does not support the video tag.
-                                </video>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, video: null, removeVideo: true })}
-                                style={{
-                                    padding: '6px 12px',
-                                    background: '#dc3545',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.9rem'
-                                }}
-                            >
-                                <Trash2 size={14} /> Remove Video
-                            </button>
-                        </div>
-                    )}
                     <input
                         className="input-field"
                         type="file"
-                        accept="video/mp4,video/webm,video/ogg,video/quicktime"
-                        onChange={e => setFormData({ ...formData, video: e.target.files[0], removeVideo: false })}
+                        multiple
+                        accept="image/jpeg,image/png,image/gif,image/svg+xml,video/mp4,video/webm,video/ogg,video/quicktime"
+                        onChange={handleMediaChange}
                     />
-                    <p style={{ fontSize: '0.8rem', marginTop: '5px', color: '#999' }}>Supported formats: MP4, WebM, OGG, MOV (Max 50MB)</p>
-                    {editItem && <p style={{ fontSize: '0.8rem', marginTop: '5px' }}>Leave empty to keep existing video.</p>}
+                    <p style={{ fontSize: '0.75rem', color: '#aaa', marginTop: '6px' }}>
+                        Images: JPEG, PNG, GIF (max 2MB) · Videos: MP4, WebM, MOV (max 50MB)
+                    </p>
                 </div>
 
                 <div className="flex" style={{ gap: '15px', marginTop: '20px', gridColumn: 'span 2' }}>

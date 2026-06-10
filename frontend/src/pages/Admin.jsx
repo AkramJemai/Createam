@@ -127,7 +127,7 @@ export default function Admin() {
             else if (activeTab === 'jobs') { setLoading(false); return; }
             else if (activeTab === 'clients') { setLoading(false); return; }
             else if (activeTab === 'agency') { setLoading(false); return; }
-            else if (activeTab === 'tasks') data = await api.getPartnerships();
+            else if (activeTab === 'tasks') data = await api.getMeetings();
 
             if (activeTab === 'tasks') {
                 setAllProjects(data || []);
@@ -240,11 +240,12 @@ export default function Admin() {
         }
     };
 
-    const handleSave = async (e) => {
+const handleSave = async (e, overrideData = null) => {
         e.preventDefault();
+        const dataToSend = overrideData || formData;
         let result = null;
         if (activeTab === 'partnership') {
-            result = editItem ? await api.updatePartnership(editItem.id, formData) : await api.createPartnership(formData);
+            result = editItem ? await api.updatePartnership(editItem.id, dataToSend) : await api.createPartnership(dataToSend);
         } else if (activeTab === 'meetings') {
             result = editItem ? await api.updateMeeting(editItem.id, formData) : await api.createMeeting(formData);
         }

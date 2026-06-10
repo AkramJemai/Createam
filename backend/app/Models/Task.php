@@ -10,6 +10,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
+        'meeting_id',
         'partnership_id',
         'assigned_to',
         'title',
@@ -20,9 +21,9 @@ class Task extends Model
         'due_date'
     ];
 
-    public function partnership()
+    public function meeting()
     {
-        return $this->belongsTo(Partnership::class);
+        return $this->belongsTo(Meeting::class);
     }
 
     public function assigned_user()

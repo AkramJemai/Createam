@@ -78,4 +78,10 @@ class MeetingController extends Controller
         $meeting->delete();
         return response()->json(null, 204);
     }
+
+    public function convertToProject(Meeting $meeting)
+    {
+        $meeting->update(['is_project' => true]);
+        return response()->json($meeting->load(['chef', 'creator']));
+    }
 }

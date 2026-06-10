@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/meetings/{meeting}', [MeetingController::class, 'getMeetingById']);
         Route::put('/meetings/{meeting}', [MeetingController::class, 'updateMeeting']);
         Route::delete('/meetings/{meeting}', [MeetingController::class, 'deleteMeeting']);
+        Route::post('/meetings/{meeting}/convert', [MeetingController::class, 'convertToProject']);
 
         Route::post('/jobs/titles', [JobController::class, 'createJobTitle']);
         Route::put('/jobs/titles/{jobTitle}', [JobController::class, 'updateJobTitle']);

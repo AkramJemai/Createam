@@ -21,7 +21,12 @@ export default function AdminMeetingsTable({ items, openEdit, handleDelete }) {
                                 <div style={{ fontSize: '10px', color: '#999' }}>{new Date(meeting.meeting_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                             </td>
                             <td style={{ padding: '15px' }}>
-                                <div style={{ fontWeight: '700' }}>{meeting.client_name}</div>
+                                <div style={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    {meeting.client_name}
+                                    {meeting.is_project && (
+                                        <span style={{ fontSize: '0.6rem', background: '#6B46C1', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>ACTIVE PROJECT</span>
+                                    )}
+                                </div>
                                 <div style={{ fontSize: '13px', color: '#666' }}>{meeting.title}</div>
                             </td>
                             <td style={{ padding: '15px' }}>

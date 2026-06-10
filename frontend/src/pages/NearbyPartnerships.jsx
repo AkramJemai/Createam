@@ -9,7 +9,8 @@ export default function NearbyPartnerships() {
     const [summary, setSummary] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [radius, setRadius] = useState(50);
+    const [radius, setRadius] = useState(10);
+    const radiusRef = React.useRef(10);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,7 +37,7 @@ export default function NearbyPartnerships() {
                         lng: position.coords.longitude
                     };
                     setLocation(coords);
-                    fetchNearby(coords.lat, coords.lng);
+                    fetchNearby(coords.lat, coords.lng, radiusRef.current);
                 },
                 (err) => {
                     setError("Location access denied. Please enable location to find nearby partnerships.");
@@ -50,7 +51,7 @@ export default function NearbyPartnerships() {
 
     const fetchNearby = async (lat, lng, r = radius) => {
         setLoading(true);
-        try {
+try {
             const data = await api.authenticatedGet(`partnerships/nearby?lat=${lat}&lng=${lng}&radius=${r}`);
             setPartnerships(data || []);
 
@@ -72,7 +73,8 @@ export default function NearbyPartnerships() {
     };
 
     const handleRadiusChange = (e) => {
-        const newRadius = e.target.value;
+        const newRadius = Number(e.target.value);
+        radiusRef.current = newRadius;
         setRadius(newRadius);
         if (location.lat) {
             fetchNearby(location.lat, location.lng, newRadius);

@@ -35,14 +35,23 @@ export default function MemberDashboard() {
         };
 
         const loadData = async () => {
-            const [projData, taskData, notifData] = await Promise.all([
-                api.getPartnerships(),
+            const [taskData, notifData] = await Promise.all([
                 api.getTasks(),
                 api.getNotifications()
             ]);
-            setProjects(projData || []);
-            setTasks(taskData || []);
+            const fetchedTasks = taskData || [];
+            setTasks(fetchedTasks);
             setNotifications(notifData || []);
+            // derive unique projects from assigned tasks
+            const seen = new Set();
+            const derived = [];
+            for (const task of fetchedTasks) {
+                if (task.meeting && !seen.has(task.meeting.id)) {
+                    seen.add(task.meeting.id);
+                    derived.push(task.meeting);
+                }
+            }
+            setProjects(derived);
         };
 
         checkAuth();
@@ -79,7 +88,7 @@ export default function MemberDashboard() {
     const roleColor = 'var(--role-member)';
 
     const getProjectTasks = (projectId) => {
-        return tasks.filter(task => task.partnership_id === projectId || task.partnership?.id === projectId);
+        return tasks.filter(task => task.meeting_id === projectId);
     };
 
     return (
@@ -119,15 +128,13 @@ export default function MemberDashboard() {
                 {activeTab === 'projects' && (
                     <div className="grid grid-2">
                         {projects.length > 0 ? projects.map(project => (
-                            <div key={project.id} className="card animate-slide-up" style={{ textAlign: 'left', padding: '30px', borderLeft: `8px solid ${project.status === 'active' ? '#38A169' : '#CBD5E0'}` }}>
+                            <div key={project.id} className="card animate-slide-up" style={{ textAlign: 'left', padding: '30px', borderLeft: `8px solid ${roleColor}` }}>
                                 <div className="flex justify-between align-center" style={{ marginBottom: '15px' }}>
-                                    <span className="label">{project.year}</span>
-                                    <span className={`role-badge ${project.status === 'active' ? 'status-active' : 'status-pending'}`}>
-                                        {project.status.toUpperCase()}
-                                    </span>
+                                    <span className="label">{new Date(project.meeting_date).toLocaleDateString()}</span>
+                                    <span className="role-badge" style={{ background: '#F3E8FF', color: '#6B46C1', fontSize: '0.6rem' }}>ACTIVE PROJECT</span>
                                 </div>
                                 <h3 className="notranslate" translate="no" style={{ fontSize: '1.4rem' }}>{project.title}</h3>
-                                <p style={{ color: '#666', marginBottom: '20px' }}>{project.cat}</p>
+                                <p style={{ color: '#666', marginBottom: '20px' }}>Client: {project.client_name}</p>
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px', flexWrap: 'wrap' }}>
                                     <button
@@ -150,10 +157,6 @@ export default function MemberDashboard() {
                                         {getProjectTasks(project.id).length} assigned task{getProjectTasks(project.id).length !== 1 ? 's' : ''}
                                     </span>
                                 </div>
-
-                                {project.status === 'active' && (
-                                    <p style={{ color: '#38A169', fontWeight: '600', fontSize: '0.9rem', marginTop: 0 }}>Project is Live</p>
-                                )}
                             </div>
                         )) : (
                             <div className="card" style={{ padding: '60px', textAlign: 'center', gridColumn: 'span 2' }}>
@@ -197,7 +200,8 @@ export default function MemberDashboard() {
                                 <div>
                                     <p className="label" style={{ color: '#38A169', marginBottom: '6px' }}>Assigned Tasks</p>
                                     <h3 style={{ margin: 0, fontSize: '1.8rem' }}>{selectedProject.title}</h3>
-                                    <p style={{ margin: '8px 0 0', color: '#718096' }}>{getProjectTasks(selectedProject.id).length} task{getProjectTasks(selectedProject.id).length !== 1 ? 's' : ''} in this project</p>
+                                    <p style={{ margin: '4px 0 0', color: '#718096', fontSize: '0.9rem' }}>Client: {selectedProject.client_name}</p>
+                                    <p style={{ margin: '4px 0 0', color: '#718096' }}>{getProjectTasks(selectedProject.id).length} task{getProjectTasks(selectedProject.id).length !== 1 ? 's' : ''} assigned to you</p>
                                 </div>
                                 <button
                                     onClick={() => setSelectedProject(null)}

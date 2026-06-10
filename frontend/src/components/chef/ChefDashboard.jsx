@@ -16,17 +16,7 @@ export default function ChefDashboard() {
     const [notifications, setNotifications] = useState([]);
     const [globalTasks, setGlobalTasks] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
-    const [showProjectModal, setShowProjectModal] = useState(false);
     const [user, setUser] = useState(null);
-    const [selectedMeeting, setSelectedMeeting] = useState(null);
-    const [projectForm, setProjectForm] = useState({
-        title: '',
-        cat: 'Production',
-        year: new Date().getFullYear().toString(),
-        tags: '',
-        img: null,
-        selectedTeam: []
-    });
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [showKanbanModal, setShowKanbanModal] = useState(false);
     const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -56,15 +46,14 @@ export default function ChefDashboard() {
 
 
     const loadData = async () => {
-        const [projData, meetData, notifData, userData, taskData] = await Promise.all([
-            api.getPartnerships(),
+        const [meetData, notifData, userData, taskData] = await Promise.all([
             api.getMeetings(),
             api.getNotifications(),
             api.getUsers(),
             api.getTasks()
         ]);
-        setProjects(projData || []);
         setMeetings(meetData || []);
+        setProjects((meetData || []).filter(m => m.is_project));
         setNotifications(notifData || []);
         setAllUsers(userData?.filter(u => u.role === 'member') || []);
         setGlobalTasks(taskData || []);
@@ -90,11 +79,11 @@ export default function ChefDashboard() {
     }, [navigate]);
 
     const handleRequestFinalization = async (project) => {
-        const confirmed = await notification.confirm("Are you sure? This will notify the Admin that production is finished and ready for the showcase.");
+        const confirmed = await notification.confirm("Are you sure? This will notify the Admin that production is finished.");
         if (!confirmed) return;
         try {
-            await api.updatePartnership(project.id, { status: 'ready_to_deploy' });
-            notification.success("Admin has been notified! The project is now pending final showcase approval.");
+            await api.updateMeeting(project.id, { status: 'ready_to_deploy' });
+            notification.success("Admin has been notified! The project is now pending final approval.");
             await loadData();
         } catch (err) {
             notification.error("Failed to submit request: " + err.message);
@@ -119,53 +108,21 @@ export default function ChefDashboard() {
         }
     };
 
-    const openProjectModal = (meeting) => {
-        setSelectedMeeting(meeting);
-        setProjectForm({
-            title: meeting.title,
-            cat: 'Production',
-            year: new Date().getFullYear().toString(),
-            tags: 'Active, High Priority',
-            img: null,
-            selectedTeam: []
-        });
-        setShowProjectModal(true);
-    };
-
-    const handleProjectSubmit = async (e) => {
-        e.preventDefault();
+    const handleConvertToProject = async (meeting) => {
+        const confirmed = await notification.confirm(`Convert "${meeting.title}" to an active project? It will appear in the Task Board.`);
+        if (!confirmed) return;
         try {
-            // 1. Create the project with status 'pending'
-            const newProject = await api.createPartnership({
-                ...projectForm,
-                status: 'pending'
-            });
-
-            if (newProject) {
-
-                // 3. Delete the meeting as it is now a project
-                if (selectedMeeting) {
-                    await api.deleteMeeting(selectedMeeting.id);
-                }
-
-                setShowProjectModal(false);
-                const projData = await api.getPartnerships();
-                setProjects(projData || []);
-
-                // Refresh meetings to show cleanup
-                const meetData = await api.getMeetings();
-                setMeetings(meetData || []);
-
-                notification.success("Provisional Project created! The meeting has been purged as it is now in active production.");
-            }
+            await api.convertMeetingToProject(meeting.id);
+            await loadData();
+            notification.success("Meeting converted to active project.");
         } catch (err) {
-            notification.error("Failed to create project: " + err.message);
+            notification.error("Failed to convert: " + err.message);
         }
     };
 
     const openTaskManager = async (project, addTask = false) => {
         setSelectedProject(project);
-        const tasks = await api.getTasks({ partnership_id: project.id });
+        const tasks = await api.getTasks({ meeting_id: project.id });
         setProjectTasks(tasks || []);
         setTaskForm({
             title: '',
@@ -189,9 +146,9 @@ export default function ChefDashboard() {
         try {
             await api.createTask({
                 ...taskForm,
-                partnership_id: selectedProject.id
+                meeting_id: selectedProject.id
             });
-            const tasks = await api.getTasks({ partnership_id: selectedProject.id });
+            const tasks = await api.getTasks({ meeting_id: selectedProject.id });
             setProjectTasks(tasks || []);
             const allTasks = await api.getTasks();
             setGlobalTasks(allTasks || []);
@@ -217,7 +174,7 @@ export default function ChefDashboard() {
             progress: newProgress,
             status: newProgress === 100 ? 'done' : (newProgress > 0 ? 'in_progress' : 'todo')
         });
-        const tasks = await api.getTasks({ partnership_id: selectedProject.id });
+        const tasks = await api.getTasks({ meeting_id: selectedProject.id });
         setProjectTasks(tasks || []);
     };
 
@@ -231,7 +188,7 @@ export default function ChefDashboard() {
         try {
             await api.deleteTask(taskId);
             if (selectedProject) {
-                const tasks = await api.getTasks({ partnership_id: selectedProject.id });
+                const tasks = await api.getTasks({ meeting_id: selectedProject.id });
                 setProjectTasks(tasks || []);
             }
             const allTasks = await api.getTasks();
@@ -285,34 +242,33 @@ export default function ChefDashboard() {
 
                 {activeTab === 'projects' && (
                     <div className="grid grid-2">
-                        {projects.filter(p => ['active', 'ready_to_deploy'].includes(p.status)).length > 0 ?
-                            projects.filter(p => ['active', 'ready_to_deploy'].includes(p.status)).map(project => {
-                                const projTasks = globalTasks.filter(t => t.partnership_id === project.id);
+                        {projects.length > 0 ?
+                            projects.map(project => {
+                                const projTasks = globalTasks.filter(t => t.meeting_id === project.id);
                                 const isAllDone = projTasks.length > 0 && projTasks.every(t => t.status === 'done');
 
                                 return (
                                     <div key={project.id} className="stat-card" style={{
                                         textAlign: 'left',
-                                        borderLeft: `8px solid ${project.status === 'ready_to_deploy' ? '#38A169' : roleColor}`,
+                                        borderLeft: `8px solid ${roleColor}`,
                                         display: 'flex',
                                         flexDirection: 'column',
                                         gap: '15px',
-                                        opacity: project.status === 'ready_to_deploy' ? 0.7 : 1
                                     }}>
                                         <div className="flex justify-between align-start">
                                             <div>
                                                 <h3 className="notranslate" translate="no" style={{ fontSize: '1.5rem' }}>{project.title}</h3>
-                                                <p style={{ margin: '5px 0', fontSize: '0.9rem', color: '#666' }}>{project.year} / {project.cat}</p>
+                                                <p style={{ margin: '5px 0', fontSize: '0.9rem', color: '#666' }}>Client: {project.client_name}</p>
                                             </div>
                                             <span
                                                 className="role-badge"
                                                 style={{
-                                                    background: project.status === 'ready_to_deploy' ? '#F0FFF4' : `${roleColor}11`,
-                                                    color: project.status === 'ready_to_deploy' ? '#2F855A' : roleColor,
+                                                    background: `${roleColor}11`,
+                                                    color: roleColor,
                                                     fontSize: '0.6rem'
                                                 }}
                                             >
-                                                {project.status === 'ready_to_deploy' ? 'READY TO DEPLOY' : 'PRODUCTION LIVE'}
+                                                ACTIVE PROJECT
                                             </span>
                                         </div>
 
@@ -332,7 +288,7 @@ export default function ChefDashboard() {
                                                 <CheckSquare size={14} /> Add Task
                                             </button>
 
-                                            {isAllDone && project.status === 'active' && (
+                                            {isAllDone && (
                                                 <button
                                                     onClick={() => handleRequestFinalization(project)}
                                                     className="btn btn-small"
@@ -385,7 +341,7 @@ export default function ChefDashboard() {
                                         letterSpacing: '1.5px',
                                         textTransform: 'uppercase'
                                     }}>
-                                        {task.partnership?.title}
+                                        {task.meeting?.title}
                                     </span>
 
                                     <div className="flex align-center" style={{ gap: '12px' }}>
@@ -525,13 +481,19 @@ export default function ChefDashboard() {
                                     <div style={{ background: '#f9f9f9', padding: '15px', borderRadius: '8px', fontSize: '0.95rem', whiteSpace: 'pre-line', border: '1px solid #eee' }}>
                                         {meeting.notes}
                                     </div>
-                                    <button
-                                        onClick={() => openProjectModal(meeting)}
-                                        className="btn btn-small"
-                                        style={{ background: roleColor, alignSelf: 'flex-start', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}
-                                    >
-                                        <Rocket size={14} /> Convert to Project
-                                    </button>
+                                    {meeting.is_project ? (
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#6B46C1', background: '#F3E8FF', padding: '4px 10px', borderRadius: '6px', alignSelf: 'flex-start' }}>
+                                            Active Project
+                                        </span>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleConvertToProject(meeting)}
+                                            className="btn btn-small"
+                                            style={{ background: roleColor, alignSelf: 'flex-start', marginTop: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                        >
+                                            <Rocket size={14} /> Convert to Project
+                                        </button>
+                                    )}
                                 </div>
                             );
                         }) : (
@@ -609,54 +571,6 @@ export default function ChefDashboard() {
                 )}
             </main>
 
-            {showProjectModal && (
-                <div className="modal-overlay" style={{
-                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-                    background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(10px)'
-                }}>
-                    <div className="card animate-slide-up" style={{ width: '600px', padding: '40px', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
-                        <button onClick={() => setShowProjectModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', color: '#999' }}>
-                            <X size={24} />
-                        </button>
-                        <h2 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <Rocket size={24} /> Deploy Project from Meeting
-                        </h2>
-                        <form onSubmit={handleProjectSubmit}>
-                            <div style={{ marginBottom: '20px' }}>
-                                <label className="label">Project Title</label>
-                                <input type="text" className="input-field" required value={projectForm.title} onChange={e => setProjectForm({ ...projectForm, title: e.target.value })} />
-                            </div>
-                            <div className="grid grid-2" style={{ gap: '20px', marginBottom: '20px' }}>
-                                <div>
-                                    <label className="label">Category</label>
-                                    <input type="text" className="input-field" required value={projectForm.cat} onChange={e => setProjectForm({ ...projectForm, cat: e.target.value })} />
-                                </div>
-                                <div>
-                                    <label className="label">Year</label>
-                                    <input type="text" className="input-field" required value={projectForm.year} onChange={e => setProjectForm({ ...projectForm, year: e.target.value })} />
-                                </div>
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <label className="label">Tags (comma separated)</label>
-                                <input type="text" className="input-field" value={projectForm.tags} onChange={e => setProjectForm({ ...projectForm, tags: e.target.value })} />
-                            </div>
-                            <div style={{ marginBottom: '20px' }}>
-                                <label className="label">Project Cover Image</label>
-                                <input type="file" className="input-field" required onChange={e => setProjectForm({ ...projectForm, img: e.target.files[0] })} />
-                            </div>
-
-                            <div className="flex gap-10">
-                                <button type="submit" className="btn" style={{ background: roleColor, flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                    <Rocket size={18} /> Deploy Provisional Project
-                                </button>
-                                <button type="button" onClick={() => setShowProjectModal(false)} className="btn" style={{ background: '#eee', color: '#666', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                                    <X size={18} /> Abort
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
 
             {/* ── KANBAN MODAL ── */}
             {showKanbanModal && (

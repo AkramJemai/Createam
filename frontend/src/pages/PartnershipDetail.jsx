@@ -107,20 +107,34 @@ export default function PartnershipDetail() {
             </div>
 
             {media.length > 1 && (
-              <div className="dots" style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'center' }}>
-                {media.map((_, i) => (
-                  <div 
-                    key={i} 
+              <div style={{ display: 'flex', gap: '12px', marginTop: '20px', overflowX: 'auto', paddingBottom: '6px' }}>
+                {media.map((item, i) => (
+                  <div
+                    key={i}
                     onClick={() => setCurrentIndex(i)}
                     style={{
-                      width: i === currentIndex ? '40px' : '10px',
-                      height: '4px',
-                      borderRadius: '2px',
-                      background: i === currentIndex ? 'var(--accent)' : 'rgba(255,255,255,0.2)',
+                      flexShrink: 0,
+                      width: '120px',
+                      height: '80px',
+                      borderRadius: '10px',
+                      overflow: 'hidden',
                       cursor: 'pointer',
-                      transition: 'all 0.4s'
+                      border: i === currentIndex ? '3px solid var(--accent)' : '3px solid rgba(255,255,255,0.1)',
+                      opacity: i === currentIndex ? 1 : 0.55,
+                      transition: 'all 0.3s',
+                      background: '#111'
                     }}
-                  />
+                  >
+                    {item.type === 'video'
+                      ? (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                          <span style={{ color: 'white', fontSize: '1.6rem' }}>▶</span>
+                          <span style={{ color: '#aaa', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Video</span>
+                        </div>
+                      )
+                      : <img src={item.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    }
+                  </div>
                 ))}
               </div>
             )}

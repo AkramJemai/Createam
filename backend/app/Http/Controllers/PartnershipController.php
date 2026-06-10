@@ -42,13 +42,20 @@ class PartnershipController extends Controller
             'title' => 'required|string',
             'client_id' => 'nullable|exists:clients,id',
             'cat' => 'required|string',
-            'tags' => 'required|string',
-            'img' => 'required_without:video|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'video' => 'required_without:img|nullable|file|mimes:mp4,webm,ogg,quicktime|max:51200',
+            'tags' => 'nullable|string',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'video' => 'nullable|file|mimes:mp4,webm,ogg,quicktime|max:51200',
+            'media' => 'nullable|array',
+            'media.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'year' => 'required|string',
             'month' => 'nullable|string',
             'description' => 'nullable|string',
+            'status' => 'nullable|string',
         ]);
+
+        if (!$request->hasFile('img') && !$request->hasFile('video') && !$request->hasFile('media')) {
+            return response()->json(['message' => 'At least one media item is required.'], 422);
+        }
 
         if ($request->hasFile('img')) {
             $file = $request->file('img');
@@ -66,6 +73,18 @@ class PartnershipController extends Controller
             $validated['video'] = $videoPath;
         }
 
+        if ($request->hasFile('media')) {
+            $mediaPaths = [];
+            foreach ($request->file('media') as $file) {
+                $ext = $file->getClientOriginalExtension();
+                $filename = Carbon::now()->format('YmdHis') . '_' . uniqid() . '.' . $ext;
+                $path = $file->storeAs('uploads/partnerships/media', $filename, 'public');
+                $mediaPaths[] = ['type' => 'photo', 'url' => $path];
+            }
+            $validated['media'] = $mediaPaths;
+        }
+
+        $validated['status'] = $validated['status'] ?? 'published';
         $partnership = Partnership::create($validated);
         return response()->json($partnership, 201);
     }
@@ -76,7 +95,7 @@ class PartnershipController extends Controller
             'title' => 'sometimes|required|string',
             'client_id' => 'sometimes|nullable|exists:clients,id',
             'cat' => 'sometimes|required|string',
-            'tags' => 'sometimes|required|string',
+            'tags' => 'nullable|string',
             'year' => 'sometimes|required|string',
             'month' => 'sometimes|nullable|string',
             'status' => 'sometimes|required|string',
@@ -95,13 +114,19 @@ class PartnershipController extends Controller
             $rules['video'] = 'nullable|string';
         }
 
+        if ($request->hasFile('media')) {
+            $rules['media'] = 'nullable|array';
+            $rules['media.*'] = 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:5120';
+        }
+
         $validated = $request->validate($rules);
 
         $willHaveImg = ($request->hasFile('img')) || ($partnership->img && ($request->input('removeImg') !== 'true' && $request->input('removeImg') !== true));
         $willHaveVideo = ($request->hasFile('video')) || ($partnership->video && ($request->input('removeVideo') !== 'true' && $request->input('removeVideo') !== true));
+        $willHaveMedia = $request->hasFile('media') || !empty($partnership->media);
 
-        if (!$willHaveImg && !$willHaveVideo) {
-            return response()->json(['message' => 'At least one media item (image or video) is required.'], 422);
+        if (!$willHaveImg && !$willHaveVideo && !$willHaveMedia) {
+            return response()->json(['message' => 'At least one media item is required.'], 422);
         }
 
         if ($request->hasFile('img')) {
@@ -132,6 +157,26 @@ class PartnershipController extends Controller
             }
         }
 
+        $existingMedia = json_decode($partnership->getRawOriginal('media') ?? '[]', true) ?: [];
+
+        if ($request->has('removeMedia')) {
+            $removeIndices = array_map('intval', (array) $request->input('removeMedia'));
+            $existingMedia = array_values(array_filter($existingMedia, function ($_, $i) use ($removeIndices) {
+                return !in_array($i, $removeIndices);
+            }, ARRAY_FILTER_USE_BOTH));
+        }
+
+        if ($request->hasFile('media')) {
+            foreach ($request->file('media') as $file) {
+                $ext = $file->getClientOriginalExtension();
+                $filename = Carbon::now()->format('YmdHis') . '_' . uniqid() . '.' . $ext;
+                $path = $file->storeAs('uploads/partnerships/media', $filename, 'public');
+                $existingMedia[] = ['type' => 'photo', 'url' => $path];
+            }
+        }
+
+        $validated['media'] = $existingMedia ?: null;
+
         $partnership->update($validated);
         return response()->json($partnership);
     }
@@ -152,7 +197,7 @@ class PartnershipController extends Controller
 
         $lat = $request->lat;
         $lng = $request->lng;
-        $radius = $request->get('radius', 50);
+        $radius = (float) $request->get('radius', 10);
 
         $partnerships = Partnership::with('client')
             ->leftJoin('clients', 'partnerships.client_id', '=', 'clients.id')
@@ -163,6 +208,14 @@ class PartnershipController extends Controller
             )
             ->whereNotNull('clients.latitude')
             ->whereNotNull('clients.longitude')
+            ->whereRaw(
+                "(6371 * acos(cos(radians(?)) * cos(radians(clients.latitude)) * cos(radians(clients.longitude) - radians(?)) + sin(radians(?)) * sin(radians(clients.latitude)))) <= ?",
+                [$lat, $lng, $lat, $radius]
+            )
+            ->orderByRaw(
+                "(6371 * acos(cos(radians(?)) * cos(radians(clients.latitude)) * cos(radians(clients.longitude) - radians(?)) + sin(radians(?)) * sin(radians(clients.latitude))))",
+                [$lat, $lng, $lat]
+            )
             ->get();
 
         return response()->json($partnerships);

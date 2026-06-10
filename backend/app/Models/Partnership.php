@@ -14,9 +14,10 @@ class Partnership extends Model
         'title',
         'client_id',
         'cat',
-        'tags',
+
         'img',
         'video',
+        'media',
         'year',
         'month',
         'clicks',

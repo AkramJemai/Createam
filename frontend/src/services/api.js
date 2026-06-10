@@ -48,6 +48,8 @@ export const authenticatedMultipart = async (endpoint, data, method = 'POST') =>
     Object.keys(data).forEach(key => {
         if (key === 'removeImg' || key === 'removeVideo') {
             formData.append(key, data[key]);
+        } else if (Array.isArray(data[key])) {
+            data[key].forEach(item => formData.append(`${key}[]`, item));
         } else if (data[key] !== null && data[key] !== undefined) {
             formData.append(key, data[key]);
         }
@@ -261,6 +263,7 @@ export const getMeetings = () => authenticatedGet('meetings');
 export const createMeeting = (data) => authenticatedPost('meetings', data);
 export const updateMeeting = (id, data) => authenticatedPut(`meetings/${id}`, data);
 export const deleteMeeting = (id) => authenticatedDelete(`meetings/${id}`);
+export const convertMeetingToProject = (id) => authenticatedPost(`meetings/${id}/convert`, {});
 
 export const getNotifications = () => authenticatedGet('notifications');
 export const markNotificationAsRead = (id) => authenticatedPut(`notifications/${id}/read`);
@@ -283,7 +286,7 @@ export const deleteClient = (id) => authenticatedDelete(`clients/${id}`);
 
 export const getClientPartnerships = (clientId) => fetchData(`clients/${clientId}/partnerships`, []);
 
-export const getNearbyPartnerships = (lat, lng, radius = 50) => {
+export const getNearbyPartnerships = (lat, lng, radius = 10) => {
     const params = new URLSearchParams({ lat, lng, radius }).toString();
     return fetchData(`partnerships/nearby?${params}`, []);
 };
