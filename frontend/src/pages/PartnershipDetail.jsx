@@ -155,10 +155,6 @@ export default function PartnershipDetail() {
                   <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600 }}>{project.year}</p>
                </div>
                <div>
-                  <p className="label" style={{ color: '#555', marginBottom: '8px' }}>Category</p>
-                  <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600 }}>{project.cat}</p>
-               </div>
-               <div style={{ gridColumn: 'span 2' }}>
                   <p className="label" style={{ color: '#555', marginBottom: '8px' }}>Client</p>
                   <p className="notranslate" translate="no" style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600 }}>{project.title.split(' ')[0]}</p>
                </div>
