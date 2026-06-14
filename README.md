@@ -1,4 +1,4 @@
-# Createam — Agency Management Platform
+# Createam - Agency Management Platform
 
 A full-stack web application for creative agencies to manage partnerships, clients, team members, and operations — with a public-facing portfolio and a private team dashboard.
 
