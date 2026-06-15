@@ -20,6 +20,22 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
     }, []);
     const handleMediaChange = (e) => {
         const files = Array.from(e.target.files);
+        const maxImageSize = 2 * 1024 * 1024;
+        const maxVideoSize = 50 * 1024 * 1024;
+        for (const file of files) {
+            const isVideo = file.type.startsWith('video/');
+            if (isVideo && file.size > maxVideoSize) {
+                setError(`"${file.name}" exceeds the 50MB video limit.`);
+                e.target.value = '';
+                return;
+            }
+            if (!isVideo && file.size > maxImageSize) {
+                setError(`"${file.name}" exceeds the 2MB image limit.`);
+                e.target.value = '';
+                return;
+            }
+        }
+        setError('');
         const mapped = files.map(file => ({
             file,
             preview: URL.createObjectURL(file),
@@ -199,7 +215,7 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
                 <div className="flex" style={{ gap: '15px', marginTop: '20px', gridColumn: 'span 2' }}>
                     <button type="submit" className="btn" style={{ background: roleColor, display: 'flex', alignItems: 'center', gap: '8px' }}>
                         {editItem ? <Check size={18} /> : <Rocket size={18} />}
-                        {editItem ? 'Confirm Changes' : 'Publish Partnership'}
+                        {editItem ? 'Confirm Changes' : 'Add Partnership'}
                     </button>
                     <button type="button" onClick={() => setShowForm(false)} className="btn" style={{ background: '#eee', color: '#666', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <X size={18} /> Cancel

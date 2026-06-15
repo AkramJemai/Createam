@@ -57,7 +57,7 @@ export default function Agency() {
                         <div className="grid grid-2" style={{ gap: '20px' }}>
                             {stats?.map(stat => (
                                 <div key={stat.id} className="card" style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--bg-soft)', border: 'none' }}>
-                                    <h4 style={{ fontSize: '3rem', fontWeight: '900', color: 'var(--primary)', margin: '0' }}>{stat.value}</h4>
+                                    <h4 className="notranslate" translate="no" style={{ fontSize: '3rem', fontWeight: '900', color: 'var(--primary)', margin: '0' }}>{stat.value}</h4>
                                     <p className="label" style={{ marginTop: '10px', fontSize: '0.65rem' }}>{stat.label}</p>
                                 </div>
                             ))}

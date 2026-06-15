@@ -35,7 +35,7 @@ class ContactController extends Controller
                 $refNum = $contact->getReferenceNumber();
                 Mail::raw(
                     "Hello {$firstName},\n\n" .
-                    "Thank you for reaching out to Createam Agency! We've successfully received your message and our team is reviewing it now.\n\n" .
+                    "Thank you for reaching out to Createam ! We've successfully received your message and our team is reviewing it now.\n\n" .
                     "Your Reference Number: {$refNum}\n\n" .
                     "We typically respond to all inquiries within 24 hours. If your matter is urgent, feel free to reach out directly at contact@createam.tn.\n\n" .
                     "Best regards,\nCreateam Agency Team",

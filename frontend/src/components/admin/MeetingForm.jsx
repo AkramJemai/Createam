@@ -30,8 +30,8 @@ export default function MeetingForm({ formData, setFormData, handleSave, setShow
                         value={formData.client_id || ''}
                         onChange={e => {
                             const selectedClient = clients?.find(c => c.id === parseInt(e.target.value));
-                            setFormData({ 
-                                ...formData, 
+                            setFormData({
+                                ...formData,
                                 client_id: e.target.value,
                                 client_name: selectedClient?.name || ''
                             });

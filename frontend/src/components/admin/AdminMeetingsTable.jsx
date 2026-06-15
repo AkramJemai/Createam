@@ -22,7 +22,7 @@ export default function AdminMeetingsTable({ items, openEdit, handleDelete }) {
                             <td style={{ padding: '15px' }}>
                                 <div style={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     {meeting.client_name}
-                                    {meeting.is_project && (
+                                    {!!meeting.is_project && (
                                         <span style={{ fontSize: '0.6rem', background: '#6B46C1', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>ACTIVE PROJECT</span>
                                     )}
                                 </div>
