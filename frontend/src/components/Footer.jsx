@@ -50,7 +50,7 @@ export default function Footer() {
             marginBottom: 0,
             fontWeight: 300
           }}>
-            Interdisciplinary design studio crafting brands for the digital age.
+            Interdisciplinary design studio crafting brands for the digital era.
           </p>
         </div>
         {}
@@ -80,7 +80,7 @@ export default function Footer() {
                 }}
                 onMouseEnter={e => e.target.style.color = 'var(--primary)'}
                 onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.7)'}
-              >{l.name}</Link>
+              >{l.name === 'Home' ? <span className="notranslate" translate="no">{l.name}</span> : l.name}</Link>
             ))}
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function Footer() {
             marginBottom: 0,
             letterSpacing: 0.5
           }}>
-            © 2026 <span className="notranslate" translate="no">Createam Agency</span>. All rights reserved.
+            © 2026 <span className="notranslate" translate="no"> Createam</span>. All rights reserved.
           </p>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
             {legalLinks.map(l => (

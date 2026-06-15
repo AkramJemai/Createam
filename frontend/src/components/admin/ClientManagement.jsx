@@ -311,7 +311,7 @@ export default function ClientManagement() {
                                     </div>
                                 </td>
                                 <td style={{ padding: '15px', color: '#666' }}>
-                                    {client.address || client.country || '—'}
+                                    {client.address || '—'}
                                 </td>
                                 <td style={{ padding: '15px', color: '#666' }}>{client.industry || '—'}</td>
                                 <td style={{ padding: '15px', textAlign: 'center' }}>

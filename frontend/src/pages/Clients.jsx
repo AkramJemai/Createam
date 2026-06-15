@@ -81,10 +81,10 @@ export default function Clients() {
                                                     style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', padding: '14px', boxSizing: 'border-box', opacity: 1 }}
                                                 />
                                             ) : (
-                                                <span style={{ fontSize: '24px', fontWeight: '900', color: '#ddd' }}>{client.name}</span>
+                                                <span className="notranslate" translate="no" style={{ fontSize: '24px', fontWeight: '900', color: '#ddd' }}>{client.name}</span>
                                             )}
                                         </div>
-                                        <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '10px' }}>{client.name}</h3>
+                                        <h3 className="notranslate" translate="no" style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '10px' }}>{client.name}</h3>
                                         <p className="label" style={{ color: 'var(--primary)', fontSize: '0.7rem', marginBottom: '15px' }}>{client.industry}</p>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', color: '#555', marginBottom: '20px', fontSize: '0.9rem' }}>
                                             <MapPin size={14} />

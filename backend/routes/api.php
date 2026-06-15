@@ -76,7 +76,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/clients/{client}', [ClientController::class, 'deleteClient']);
     });
     Route::post('/ai/generate-prompt', [\App\Http\Controllers\AIController::class, 'generatePrompt']);
-    Route::post('/ai/summarize-nearby', [\App\Http\Controllers\AIController::class, 'summarizeNearby']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

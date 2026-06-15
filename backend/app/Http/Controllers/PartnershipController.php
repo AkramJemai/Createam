@@ -188,10 +188,10 @@ class PartnershipController extends Controller
             ->get();
         return response()->json($partnerships);
     }
-    private function geocodeAddress(?string $address, ?string $city = null, ?string $country = null): ?array
+    private function geocodeAddress(?string $address): ?array
     {
         try {
-            $fullAddress = trim(implode(', ', array_filter([$address, $city, $country])));
+            $fullAddress = trim($address ?? '');
             if (empty($fullAddress)) {
                 return null;
             }

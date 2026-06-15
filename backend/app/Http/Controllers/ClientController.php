@@ -33,7 +33,7 @@ class ClientController extends Controller
             'logo' => 'nullable|image|max:2048',
         ]);
         if (empty($validated['latitude']) && empty($validated['longitude']) && !empty($validated['address'])) {
-            $coords = $this->geocodeAddress($validated['address'], $validated['country'] ?? null);
+            $coords = $this->geocodeAddress($validated['address']);
             if ($coords) {
                 $validated['latitude'] = $coords['lat'];
                 $validated['longitude'] = $coords['lng'];
@@ -64,7 +64,7 @@ class ClientController extends Controller
             'logo' => 'nullable|image|max:2048',
         ]);
         if (empty($validated['latitude']) && empty($validated['longitude']) && !empty($validated['address'])) {
-            $coords = $this->geocodeAddress($validated['address'], $validated['country'] ?? null);
+            $coords = $this->geocodeAddress($validated['address']);
             if ($coords) {
                 $validated['latitude'] = $coords['lat'];
                 $validated['longitude'] = $coords['lng'];
@@ -91,10 +91,10 @@ class ClientController extends Controller
         $client->delete();
         return response()->json(null, 204);
     }
-    private function geocodeAddress(?string $address, ?string $country = null): ?array
+    private function geocodeAddress(?string $address): ?array
     {
         try {
-            $fullAddress = trim(implode(', ', array_filter([$address, $country])));
+            $fullAddress = trim($address ?? '');
             if (empty($fullAddress)) {
                 return null;
             }

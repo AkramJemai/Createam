@@ -229,7 +229,7 @@ export default function Home() {
           </div>
           {filtered.length === 0 && (
             <div style={{ textAlign: 'center', padding: 'clamp(80px, 15vw, 160px) 20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
-              <p className="label animate-pulse" style={{ color: '#444' }}>System Idle 
+              <p className="label animate-pulse" style={{ color: '#444' }}>System Idle</p>
             </div>
           )}
           <div style={{ textAlign: 'center', marginTop: 'clamp(60px, 10vw, 120px)' }}>

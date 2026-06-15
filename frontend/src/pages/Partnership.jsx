@@ -50,10 +50,10 @@ export default function Partnership() {
     const reverseGeocode = async (latitude, longitude) => {
         try {
             const response = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en`
             );
             const data = await response.json();
-            return data.address?.city || data.address?.town || data.address?.village || 'your location';
+            return data.address?.city || data.address?.town || data.address?.village || data.address?.suburb || data.address?.county || data.address?.state || 'your location';
         } catch (error) {
             console.error('Reverse geocoding error:', error);
             return 'your location';
@@ -288,7 +288,7 @@ export default function Partnership() {
                                     >
                                         {loadingNearby ? 'Getting your location...' : 'Find Partnerships Near Me'}
                                     </button>
-                                    {userLocation && <p style={{ marginTop: '10px', fontSize: '0.85rem', color: '#666' }}>Since you are from {userCity}, here are your nearest partnerships</p>}
+                                    {userLocation && <p style={{ marginTop: '10px', fontSize: '0.85rem', color: '#666' }}>Since you are from <span className="notranslate" translate="no">{userCity}</span>, here are your nearest partnerships</p>}
                                 </div>
                                 {}
                                 {showNearby && nearbyProjects.length > 0 && (
