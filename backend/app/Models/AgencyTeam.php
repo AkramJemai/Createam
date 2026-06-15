@@ -5,5 +5,5 @@ use Illuminate\Database\Eloquent\Model;
 class AgencyTeam extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'role', 'photo', 'bio'];
+    protected $fillable = ['name', 'role'];
 }

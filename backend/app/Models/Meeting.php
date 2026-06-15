@@ -12,10 +12,6 @@ class Meeting extends Model
         'notes',
         'chef_id',
         'created_by',
-        'is_project'
-    ];
-    protected $casts = [
-        'is_project' => 'boolean',
     ];
     public function tasks()
     {

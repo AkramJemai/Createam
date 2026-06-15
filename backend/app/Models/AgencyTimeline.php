@@ -5,5 +5,5 @@ use Illuminate\Database\Eloquent\Model;
 class AgencyTimeline extends Model
 {
     use HasFactory;
-    protected $fillable = ['year', 'title', 'description', 'image'];
+    protected $fillable = ['year', 'title', 'description'];
 }

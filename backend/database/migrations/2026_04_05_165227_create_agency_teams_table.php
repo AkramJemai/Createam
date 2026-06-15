@@ -17,9 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('role');
-            $table->string('photo')->nullable();
-            $table->text('bio')->nullable();
-            $table->integer('order')->default(0);
+$table->integer('order')->default(0);
             $table->timestamps();
         });
     }

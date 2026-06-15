@@ -6,7 +6,6 @@ class Task extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'meeting_id',
         'partnership_id',
         'assigned_to',
         'title',
