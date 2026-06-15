@@ -2,31 +2,24 @@ import { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, Globe } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher.jsx';
-
 const LINKS = [
   { label: 'Partnerships', to: '/partnership' },
   { label: 'Clients', to: '/clients' },
   { label: 'Agency', to: '/agency' },
   { label: 'Contact', to: '/contact' },
 ];
-
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);
-
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -37,10 +30,9 @@ export default function Navbar() {
       document.body.style.overflow = '';
     };
   }, [mobileMenuOpen]);
-
   return (
     <>
-      {/* Desktop Navbar - hidden on mobile */}
+      {}
       <nav className="desktop-navbar" style={{
         position: 'fixed',
         top: 0,
@@ -56,7 +48,7 @@ export default function Navbar() {
         boxShadow: scrolled ? '0 4px 30px rgba(117, 2, 80, 0.1)' : 'none',
         transition: 'var(--transition-smooth)',
       }}>
-        {/* Logo */}
+        {}
         <Link to="/" className="notranslate logo-link" translate="no" style={{
           display: 'flex',
           alignItems: 'center',
@@ -86,8 +78,7 @@ export default function Navbar() {
             Createam<span style={{ color: 'var(--primary)' }}>.</span>
           </span>
         </Link>
-
-        {/* Navigation Links - Centered */}
+        {}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -115,14 +106,12 @@ export default function Navbar() {
             </NavLink>
           ))}
         </div>
-
-        {/* Right side - Language Switcher */}
+        {}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <LanguageSwitcher />
         </div>
       </nav>
-
-      {/* Mobile Navbar - hidden on desktop */}
+      {}
       <nav className="mobile-navbar" style={{
         position: 'fixed',
         top: 0,
@@ -165,8 +154,7 @@ export default function Navbar() {
             Createam<span style={{ color: 'var(--accent)' }}>.</span>
           </span>
         </Link>
-
-        {/* Mobile Menu Button */}
+        {}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
@@ -191,8 +179,7 @@ export default function Navbar() {
           )}
         </button>
       </nav>
-
-      {/* Mobile Menu Overlay */}
+      {}
       {mobileMenuOpen && (
         <>
           <div
@@ -223,11 +210,10 @@ export default function Navbar() {
             boxShadow: '-5px 0 30px rgba(0,0,0,0.1)',
             animation: 'slideInRight 0.3s ease-out'
           }}>
-            {/* Language Switcher in mobile menu */}
+            {}
             <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
               <LanguageSwitcher />
             </div>
-
             {LINKS.map(l => (
               <NavLink
                 key={l.to}
@@ -252,7 +238,6 @@ export default function Navbar() {
                 {l.label}
               </NavLink>
             ))}
-
             <div style={{ marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid rgba(0,0,0,0.1)' }}>
               <Link
                 to="/login"
@@ -279,7 +264,6 @@ export default function Navbar() {
           </div>
         </>
       )}
-
       <style>{`
         @keyframes slideInRight {
           from {
@@ -291,15 +275,12 @@ export default function Navbar() {
             opacity: 1;
           }
         }
-
         .desktop-navbar {
           display: flex !important;
         }
-
         .mobile-navbar {
           display: none !important;
         }
-
         /* Desktop navbar visible only on desktop */
         @media (max-width: 768px) {
           .desktop-navbar {

@@ -1,25 +1,19 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Meeting;
 use App\Models\Notification;
 use Illuminate\Http\Request;
-
 class MeetingController extends Controller
 {
     public function getAllMeetings(Request $request)
     {
         $user = $request->user();
         $query = Meeting::with(['chef', 'creator'])->latest();
-
         if ($user->role === 'chef') {
             $query->where('chef_id', $user->id);
         }
-
         return response()->json($query->get());
     }
-
     public function createMeeting(Request $request)
     {
         $validated = $request->validate([
@@ -29,7 +23,6 @@ class MeetingController extends Controller
             'notes' => 'required|string',
             'chef_id' => 'required|exists:users,id',
         ]);
-
         $meeting = Meeting::create([
             'title' => $validated['title'],
             'client_name' => $validated['client_name'],
@@ -38,7 +31,6 @@ class MeetingController extends Controller
             'chef_id' => $validated['chef_id'],
             'created_by' => $request->user()->id,
         ]);
-
         Notification::create([
             'user_id' => $validated['chef_id'],
             'title' => 'New Meeting Assigned',
@@ -49,15 +41,12 @@ class MeetingController extends Controller
                 'client_name' => $validated['client_name'],
             ]
         ]);
-
         return response()->json($meeting, 201);
     }
-
     public function getMeetingById(Meeting $meeting)
     {
         return response()->json($meeting->load(['chef', 'creator']));
     }
-
     public function updateMeeting(Request $request, Meeting $meeting)
     {
         $validated = $request->validate([
@@ -67,18 +56,14 @@ class MeetingController extends Controller
             'notes' => 'sometimes|string',
             'chef_id' => 'sometimes|exists:users,id',
         ]);
-
         $meeting->update($validated);
-
         return response()->json($meeting);
     }
-
     public function deleteMeeting(Meeting $meeting)
     {
         $meeting->delete();
         return response()->json(null, 204);
     }
-
     public function convertToProject(Meeting $meeting)
     {
         $meeting->update(['is_project' => true]);

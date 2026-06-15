@@ -1,14 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, Trash2, Check } from 'lucide-react';
 import * as api from '../../services/api';
-
 export default function NotificationBell({ notifications, setNotifications, roleColor, onDeleteNotification }) {
     const [open, setOpen] = useState(false);
     const containerRef = useRef(null);
-
     const unreadCount = Array.isArray(notifications) ? (notifications || []).filter(n => !n.read_at).length : 0;
-
-    // Close on outside click
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (containerRef.current && !containerRef.current.contains(e.target)) {
@@ -20,7 +16,6 @@ export default function NotificationBell({ notifications, setNotifications, role
         }
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [open]);
-
     const handleMarkAsRead = async (id) => {
         try {
             await api.markNotificationAsRead(id);
@@ -29,7 +24,6 @@ export default function NotificationBell({ notifications, setNotifications, role
             console.error('Failed to mark notification as read:', err);
         }
     };
-
     const handleMarkAllAsRead = async () => {
         try {
             await api.markAllNotificationsAsRead();
@@ -38,11 +32,8 @@ export default function NotificationBell({ notifications, setNotifications, role
             console.error('Failed to mark all as read:', err);
         }
     };
-
     const handleDelete = async (id, e) => {
         e.stopPropagation();
-        
-        // Use the provided callback if available, otherwise use browser confirm
         if (onDeleteNotification) {
             const confirmed = await onDeleteNotification();
             if (!confirmed) return;
@@ -51,7 +42,6 @@ export default function NotificationBell({ notifications, setNotifications, role
                 return;
             }
         }
-        
         try {
             await api.deleteNotification(id);
             setNotifications(prev => prev.filter(n => n.id !== id));
@@ -59,9 +49,7 @@ export default function NotificationBell({ notifications, setNotifications, role
             console.error('Failed to delete notification:', err);
         }
     };
-
     const notifArray = Array.isArray(notifications) ? notifications : [];
-
     return (
         <div ref={containerRef} style={{ position: 'relative' }}>
             <button
@@ -110,7 +98,6 @@ export default function NotificationBell({ notifications, setNotifications, role
                     </span>
                 )}
             </button>
-
             {open && (
                 <div
                     style={{
@@ -168,7 +155,6 @@ export default function NotificationBell({ notifications, setNotifications, role
                             </button>
                         )}
                     </div>
-
                     <div style={{ overflowY: 'auto', flex: 1 }}>
                         {notifArray.length === 0 ? (
                             <div style={{ padding: '50px 20px', textAlign: 'center', color: '#999' }}>

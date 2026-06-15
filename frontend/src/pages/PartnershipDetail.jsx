@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getPartnership } from '../services/api';
-
 export default function PartnershipDetail() {
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-
   useEffect(() => {
     const loadProject = async () => {
       const data = await getPartnership(id);
@@ -17,7 +15,6 @@ export default function PartnershipDetail() {
     loadProject();
     window.scrollTo(0, 0);
   }, [id]);
-
   const media = project ? [
     ...(project.img ? [{ type: 'photo', url: project.img }] : []),
     ...(project.video ? [{ type: 'video', url: project.video }] : []),
@@ -25,21 +22,16 @@ export default function PartnershipDetail() {
       typeof item === 'string' ? { type: 'photo', url: item } : item
     )))
   ].filter((item) => item?.url) : [];
-
   useEffect(() => {
     if (media.length && currentIndex >= media.length) {
       setCurrentIndex(0);
     }
   }, [currentIndex, media.length]);
-
   if (loading) return <div className="container section">Loading details...</div>;
   if (!project) return <div className="container section">Project not found.</div>;
-
   const currentMedia = media[currentIndex];
-
   const next = () => setCurrentIndex((prev) => (prev + 1) % media.length);
   const prev = () => setCurrentIndex((prev) => (prev - 1 + media.length) % media.length);
-
   return (
     <div className="partnership-detail-page animate-slide-up" style={{ minHeight: '100vh', background: '#000', color: 'white', paddingBottom: '100px' }}>
       <div className="container" style={{ paddingTop: '40px' }}>
@@ -56,14 +48,12 @@ export default function PartnershipDetail() {
         }} className="back-link">
           Back to Partnerships
         </Link>
-
         <div className="detail-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
           gap: '60px',
           alignItems: 'start'
         }}>
-          
           <div className="media-section notranslate" translate="no">
             <div className="media-container" style={{
               width: '100%',
@@ -97,7 +87,6 @@ export default function PartnershipDetail() {
                   style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }} 
                 />
               )}
-
               {media.length > 1 && (
                 <>
                   <button className="nav-btn prev" onClick={prev} style={{ left: '25px', width: '60px', height: '60px', fontSize: '30px' }}>‹</button>
@@ -105,7 +94,6 @@ export default function PartnershipDetail() {
                 </>
               )}
             </div>
-
             {media.length > 1 && (
               <div style={{ display: 'flex', gap: '12px', marginTop: '20px', overflowX: 'auto', paddingBottom: '6px' }}>
                 {media.map((item, i) => (
@@ -139,12 +127,10 @@ export default function PartnershipDetail() {
               </div>
             )}
           </div>
-
           <div className="info-section">
             <p className="label" style={{ color: 'var(--accent)', marginBottom: '20px', fontSize: '1rem', display: 'block' }}>{project.cat}</p>
             <h1 className="notranslate" translate="no" style={{ fontSize: '5rem', marginBottom: '30px', lineHeight: '0.9', fontWeight: 900, letterSpacing: '-2px' }}>{project.title}</h1>
             <div style={{ width: '80px', height: '4px', background: 'var(--primary)', marginBottom: '40px' }}></div>
-            
             <p style={{ 
               color: '#bbb', 
               fontSize: '1.3rem', 
@@ -154,7 +140,6 @@ export default function PartnershipDetail() {
             }}>
               {project.description}
             </p>
-
             <div className="details-card" style={{ 
               background: '#0a0a0a', 
               padding: '40px', 
@@ -174,7 +159,6 @@ export default function PartnershipDetail() {
                </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

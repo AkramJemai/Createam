@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useNotification } from '../hooks/useNotification';
 import { getPartnerships, getPartnershipCategories, trackPartnershipClick, getNearbyPartnerships } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
-
 export default function Partnership() {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -18,10 +17,8 @@ export default function Partnership() {
     const [sortBy, setSortBy] = useState('default');
     const [showSortDropdown, setShowSortDropdown] = useState(false);
     const notification = useNotification();
-
     useEffect(() => {
         const load = async () => {
-            // Fetch in parallel and cache results
             const [pData, cData] = await Promise.all([
                 getPartnerships(),
                 getPartnershipCategories()
@@ -30,18 +27,15 @@ export default function Partnership() {
             if (cData && cData.length > 0) {
                 setCategories(['All', ...cData.map(c => c.name)]);
             } else {
-                // Fallback to deriving from projects if API fails or is empty
                 setCategories(['All', ...new Set((pData || []).map(p => p.cat))]);
             }
             setLoading(false);
         };
         load();
     }, []);
-
     const filtered = filter === 'All'
         ? projects.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()))
         : projects.filter(p => p.cat === filter && p.title.toLowerCase().includes(searchQuery.toLowerCase()));
-
     const sorted = [...filtered].sort((a, b) => {
         if (sortBy === 'popular') {
             return (b.clicks || 0) - (a.clicks || 0);
@@ -50,11 +44,9 @@ export default function Partnership() {
         }
         return 0;
     });
-
     const handleTrackClick = (id) => {
         trackPartnershipClick(id);
     };
-
     const reverseGeocode = async (latitude, longitude) => {
         try {
             const response = await fetch(
@@ -67,7 +59,6 @@ export default function Partnership() {
             return 'your location';
         }
     };
-
     const handleGetNearby = async () => {
         setLoadingNearby(true);
         try {
@@ -75,10 +66,8 @@ export default function Partnership() {
                 navigator.geolocation.getCurrentPosition(async (position) => {
                     const { latitude, longitude } = position.coords;
                     setUserLocation({ latitude, longitude });
-
                     const city = await reverseGeocode(latitude, longitude);
                     setUserCity(city);
-
                     const nearby = await getNearbyPartnerships(latitude, longitude);
                     setNearbyProjects(nearby || []);
                     setShowNearby(true);
@@ -95,7 +84,6 @@ export default function Partnership() {
             setLoadingNearby(false);
         }
     };
-
     return (
         <div className="animate-slide-up">
             <section className="section" style={{ background: '#000', color: '#fff', paddingTop: '80px', paddingBottom: '90px', textAlign: 'center' }}>
@@ -107,14 +95,13 @@ export default function Partnership() {
                     </p>
                 </div>
             </section>
-
             <section className="section" style={{ background: '#fff', marginTop: '-60px', borderRadius: '40px 40px 0 0', position: 'relative', zIndex: 10 }}>
                 <div className="container">
                     {loading ? (
                         <LoadingSpinner />
                     ) : (
                         <div style={{ display: 'flex', gap: '40px' }}>
-                            {/* Sidebar - Left */}
+                            {}
                             <div style={{ width: '200px', flexShrink: 0 }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', position: 'sticky', top: '20px' }}>
                                     {categories.map(cat => (
@@ -142,8 +129,7 @@ export default function Partnership() {
                                     ))}
                                 </div>
                             </div>
-
-                            {/* Main Content - Right */}
+                            {}
                             <div style={{ flex: 1 }}>
                                 <div style={{ marginBottom: '40px' }}>
                                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -166,8 +152,7 @@ export default function Partnership() {
                                             onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
                                             onBlur={(e) => e.target.style.borderColor = '#eee'}
                                         />
-
-                                        {/* Sort Dropdown */}
+                                        {}
                                         <div style={{ position: 'relative' }}>
                                             <button
                                                 onClick={() => setShowSortDropdown(!showSortDropdown)}
@@ -193,7 +178,6 @@ export default function Partnership() {
                                             >
                                                 Sort ▼
                                             </button>
-
                                             {showSortDropdown && (
                                                 <div style={{
                                                     position: 'absolute',
@@ -282,8 +266,7 @@ export default function Partnership() {
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Nearby Button */}
+                                {}
                                 <div style={{ marginBottom: '40px', textAlign: 'center' }}>
                                     <button
                                         onClick={handleGetNearby}
@@ -307,8 +290,7 @@ export default function Partnership() {
                                     </button>
                                     {userLocation && <p style={{ marginTop: '10px', fontSize: '0.85rem', color: '#666' }}>Since you are from {userCity}, here are your nearest partnerships</p>}
                                 </div>
-
-                                {/* Show nearby results if active */}
+                                {}
                                 {showNearby && nearbyProjects.length > 0 && (
                                     <div style={{ marginBottom: '60px', padding: '30px', background: '#f5f5f5', borderRadius: '20px' }}>
                                         <h2 style={{ marginBottom: '30px', color: '#333' }}>Nearby Partnerships ({nearbyProjects.length})</h2>
@@ -354,7 +336,6 @@ export default function Partnership() {
                                                             }}
                                                         />
                                                     )}
-
                                                     <div className="partnership-overlay" style={{
                                                         position: 'absolute',
                                                         top: 0,
@@ -394,8 +375,7 @@ export default function Partnership() {
                                         <p style={{ color: '#999', fontSize: '1rem' }}>No partnerships found near your location</p>
                                     </div>
                                 )}
-
-                                {/* Grid */}
+                                {}
                                 <div className="grid grid-2" style={{ gap: '40px' }}>
                                     {sorted.map(p => (
                                         <Link
@@ -438,7 +418,6 @@ export default function Partnership() {
                                                     }}
                                                 />
                                             )}
-
                                             <div className="partnership-overlay" style={{
                                                 position: 'absolute',
                                                 top: 0,
@@ -471,7 +450,6 @@ export default function Partnership() {
                                         </Link>
                                     ))}
                                 </div>
-
                                 {sorted.length === 0 && (
                                     <div style={{ textAlign: 'center', padding: '100px 0' }}>
                                         <h2 style={{ color: '#ccc' }}>No projects found in this category.</h2>

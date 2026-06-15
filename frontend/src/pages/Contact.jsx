@@ -3,7 +3,6 @@ import { postContact, getLeadCategories } from '../services/api';
 import { useNotification } from '../hooks/useNotification';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
 export default function Contact() {
   const [form, setForm] = useState({ FullName: '', email: '', subject: '', message: '', Status: 'Pending' });
   const [sent, setSent] = useState(false);
@@ -13,7 +12,6 @@ export default function Contact() {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const notification = useNotification();
-
   useEffect(() => {
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
@@ -22,7 +20,6 @@ export default function Contact() {
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
     });
   }, []);
-
   useEffect(() => {
     if (mapRef.current && !mapInstance.current) {
       mapInstance.current = L.map(mapRef.current, { scrollWheelZoom: false }).setView([36.8185, 10.1820], 16);
@@ -30,8 +27,6 @@ export default function Contact() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
       }).addTo(mapInstance.current);
       L.marker([36.8185, 10.1820]).addTo(mapInstance.current).bindPopup('<span class="notranslate" translate="no">Createam Agency</span>').openPopup();
-
-      // Ensure the map container is correctly sized
       setTimeout(() => {
         if (mapInstance.current) mapInstance.current.invalidateSize();
       }, 250);
@@ -43,19 +38,16 @@ export default function Contact() {
       }
     };
   }, []);
-
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-
     try {
       const response = await postContact(form);
       if (response?.referenceNumber) {
         setReferenceNumber(response.referenceNumber);
         setShowForm(false);
-        setTimeout(() => setSent(true), 300); // Wait for form fade-out
+        setTimeout(() => setSent(true), 300); 
       } else {
         notification.error('Something went wrong.');
       }
@@ -65,14 +57,12 @@ export default function Contact() {
       setSubmitting(false);
     }
   };
-
   const handleSendAnother = () => {
     setSent(false);
     setShowForm(true);
     setForm({ FullName: '', email: '', subject: '', message: '', Status: 'Pending' });
     setReferenceNumber('');
   };
-
   return (
     <div className="container section">
       <h1 style={{ marginBottom: '10px' }}>Support & Help</h1>
@@ -80,7 +70,6 @@ export default function Contact() {
         Found a bug? Have a specific question about our services or your account?
         Tell us what's on your mind and we'll get back to you as soon as possible.
       </p>
-
       <div className="grid grid-2">
         <div>
           <h3>Direct Channels</h3>
@@ -94,7 +83,6 @@ export default function Contact() {
                 <a href="mailto:contact@createam.tn" style={{ color: 'var(--text)', fontWeight: '600', fontSize: '16px', textDecoration: 'none', transition: 'var(--transition-smooth)' }} onMouseEnter={e => e.target.style.color = 'var(--primary)'} onMouseLeave={e => e.target.style.color = 'var(--text)'}>contact@createam.tn</a>
               </div>
             </div>
-
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
               <div style={{ background: 'rgba(255, 62, 0, 0.08)', padding: '12px', borderRadius: '12px', color: 'var(--primary)', display: 'flex' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
@@ -107,9 +95,8 @@ export default function Contact() {
           </div>
           <div ref={mapRef} style={{ height: '450px', borderRadius: '8px', marginTop: '20px', position: 'relative', overflow: 'hidden' }}></div>
         </div>
-
         <div>
-          {/* Informational note about form purpose */}
+          {}
           <div style={{
             marginBottom: '18px',
             padding: '12px 16px',
@@ -123,7 +110,6 @@ export default function Contact() {
               This form is intended for reporting technical problems with the website. We appreciate your concern, but please do not expect an immediate reply — we will work on improving the site and will reach out when necessary. For urgent matters, contact us at <a href="mailto:contact@createam.tn" style={{ color: 'var(--primary)', fontWeight: 600 }}>contact@createam.tn</a>.
             </div>
           </div>
-
           {sent && !showForm ? (
             <div className="card" style={{ 
               textAlign: 'center', 
@@ -132,7 +118,7 @@ export default function Contact() {
               animation: 'fadeIn 0.6s ease-out',
               borderTop: '4px solid var(--primary)'
             }}>
-              {/* Checkmark Icon */}
+              {}
               <div style={{ 
                 background: 'rgba(117, 2, 80, 0.08)', 
                 width: '80px', 
@@ -148,8 +134,7 @@ export default function Contact() {
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </div>
-
-              {/* Title */}
+              {}
               <h2 style={{ 
                 fontSize: '28px', 
                 fontWeight: 900, 
@@ -157,8 +142,7 @@ export default function Contact() {
                 marginBottom: '15px',
                 marginTop: 0
               }}>Message received!</h2>
-
-              {/* Thank you message with name and email */}
+              {}
               <p style={{ 
                 fontSize: '15px', 
                 color: '#333',
@@ -169,7 +153,6 @@ export default function Contact() {
               }}>
                 Thank you, <strong>{form.FullName.split(' ')[0]}</strong>! We've received your message at <strong>{form.email}</strong>. Our team will reply within 24 hours.
               </p>
-
               {/* Reference number */}
               <div style={{ 
                 background: 'rgba(117, 2, 80, 0.05)',
@@ -194,7 +177,6 @@ export default function Contact() {
                   fontFamily: 'monospace'
                 }}>{referenceNumber}</p>
               </div>
-
               {/* Urgent matters contact */}
               <p style={{ 
                 fontSize: '13px', 
@@ -207,7 +189,6 @@ export default function Contact() {
                   textDecoration: 'none'
                 }}>contact@createam.tn</a>
               </p>
-
               {/* Action button */}
               <button 
                 onClick={handleSendAnother}
@@ -254,7 +235,6 @@ export default function Contact() {
           )}
         </div>
       </div>
-
       <style>{`
         @keyframes fadeIn {
           from {
@@ -280,5 +260,3 @@ export default function Contact() {
     </div>
   );
 }
-
-

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import * as api from '../../services/api';
-
 export default function AIPromptGenerator({ roleColor }) {
     const [formData, setFormData] = useState({
         subject: '',
@@ -15,25 +14,20 @@ export default function AIPromptGenerator({ roleColor }) {
     const [result, setResult] = useState('');
     const [loading, setLoading] = useState(false);
     const [copied, setCopied] = useState(false);
-
     const categories = ['Logo Design', 'UI/UX Interface', '3D Scene', 'Packaging', 'Social Media Branding'];
     const styles = ['Minimalist', 'Cyberpunk', 'Luxury', 'Retro', 'Bauhaus', 'Futuristic'];
     const subjectLength = formData.subject.trim().length;
-
     const handleGenerate = async (e) => {
         e.preventDefault();
         setLoading(true);
         setResult('');
         setCopied(false);
-
         const payload = {
             ...formData,
             category: formData.category === 'Custom' ? formData.customCategory.trim() : formData.category,
             style: formData.style === 'Custom' ? formData.customStyle.trim() : formData.style
         };
-        
         try {
-            // Need to add generateAIPrompt to api.js
             const res = await api.authenticatedPost('ai/generate-prompt', payload);
             if (res && res.prompt) {
                 setResult(res.prompt);
@@ -45,20 +39,17 @@ export default function AIPromptGenerator({ roleColor }) {
             setLoading(false);
         }
     };
-
     const copyToClipboard = () => {
         navigator.clipboard.writeText(result);
         setCopied(true);
         setTimeout(() => setCopied(false), 1800);
     };
-
     const surpriseMe = () => {
         const category = categories[Math.floor(Math.random() * categories.length)];
         const style = styles[Math.floor(Math.random() * styles.length)];
         const moods = ['Dreamlike', 'Bold', 'Elegant', 'Mysterious', 'Playful', 'Premium'];
         const lighting = ['Soft studio', 'Golden hour', 'Neon rim light', 'Cinematic contrast', 'Natural daylight'];
         const rendering = ['4k', '8k', 'photorealistic', 'high-detail 3D render', 'editorial polish'];
-
         setFormData({
             ...formData,
             category,
@@ -69,7 +60,6 @@ export default function AIPromptGenerator({ roleColor }) {
         });
         setCopied(false);
     };
-
     return (
         <div className="grid grid-2" style={{ gap: '40px' }}>
             <div className="card" style={{ padding: '40px', borderTop: `6px solid ${roleColor}` }}>
@@ -92,7 +82,6 @@ export default function AIPromptGenerator({ roleColor }) {
                             style={{ resize: 'vertical', minHeight: '140px', lineHeight: '1.6' }}
                         />
                     </div>
-                    
                     <div className="grid grid-2" style={{ gap: '20px', marginBottom: '20px' }}>
                         <div>
                             <label className="label">Category</label>
@@ -137,7 +126,6 @@ export default function AIPromptGenerator({ roleColor }) {
                             )}
                         </div>
                     </div>
-
                     <div className="grid grid-3" style={{ gap: '20px', marginBottom: '30px' }}>
                         <div>
                             <label className="label">Mood</label>
@@ -167,7 +155,6 @@ export default function AIPromptGenerator({ roleColor }) {
                             />
                         </div>
                     </div>
-
                     <div className="grid grid-2" style={{ gap: '14px' }}>
                         <button 
                             type="button"
@@ -189,11 +176,9 @@ export default function AIPromptGenerator({ roleColor }) {
                     </div>
                 </form>
             </div>
-
             <div className="flex-column" style={{ gap: '20px' }}>
                 <div className="card" style={{ flex: 1, padding: '40px', background: '#f8f9fa', border: '1px dashed #ddd', position: 'relative' }}>
                     <h3 style={{ marginBottom: '20px', fontSize: '1rem', color: '#666' }}>Engineered Prompt Output</h3>
-                    
                     {result ? (
                         <div className="animate-fade-in">
                             <p style={{ 
@@ -222,7 +207,6 @@ export default function AIPromptGenerator({ roleColor }) {
                         </div>
                     )}
                 </div>
-                
                 <div className="card" style={{ padding: '20px', background: '#e6fffa', border: '1px solid #b2f5ea', color: '#2c7a7b' }}>
                     <p style={{ fontSize: '0.8rem', margin: 0, fontWeight: 700 }}>
                         PRO TIP: Use the generated prompt in Midjourney or DALL-E for best results in production.

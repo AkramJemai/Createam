@@ -3,16 +3,13 @@ import { Plus, Pencil, Trash2, X, Briefcase, ChevronUp, ChevronDown, ChevronsUpD
 import LoadingSpinner from '../LoadingSpinner';
 import { useNotification } from '../../hooks/useNotification';
 import * as api from '../../services/api';
-
 const API_STORAGE = 'http://127.0.0.1:8000/storage';
-
 export default function ClientManagement() {
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editClient, setEditClient] = useState(null);
     const [message, setMessage] = useState({ text: '', error: false });
-    // const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
     const [formData, setFormData] = useState({
         name: '', address: '',
         industry: '', logo: null
@@ -20,48 +17,26 @@ export default function ClientManagement() {
     const [selectedClient, setSelectedClient] = useState(null);
     const [clientProjects, setClientProjects] = useState([]);
     const notification = useNotification();
-
     useEffect(() => { loadClients(); }, []);
-
     useEffect(() => {
         if (!message.text || message.error) return;
-
         const timer = setTimeout(() => {
             setMessage({ text: '', error: false });
         }, 5000);
-
         return () => clearTimeout(timer);
     }, [message.text, message.error]);
-
     const loadClients = async (sortBy = 'created_at', sortDir = 'desc') => {
         setLoading(true);
         const data = await api.getClients({ sort_by: sortBy, sort_dir: sortDir });
-
-        // Load partnership counts for each client
         const clientsWithCounts = await Promise.all(
             (data || []).map(async (client) => {
                 const partnerships = await api.getClientPartnerships(client.id);
                 return { ...client, partnerships_count: (partnerships || []).length };
             })
         );
-
         setClients(clientsWithCounts);
         setLoading(false);
     };
-
-    // const handleSort = (key) => {
-    //     const direction = sortConfig.key === key && sortConfig.direction === 'asc' ? 'desc' : 'asc';
-    //     setSortConfig({ key, direction });
-    //     loadClients(key, direction);
-    // };
-
-    // const getSortIcon = (key) => {
-    //     if (sortConfig.key !== key) return <ChevronsUpDown size={14} style={{ marginLeft: '5px', verticalAlign: 'middle', opacity: 0.3 }} />;
-    //     return sortConfig.direction === 'asc'
-    //         ? <ChevronUp size={14} style={{ marginLeft: '5px', verticalAlign: 'middle' }} />
-    //         : <ChevronDown size={14} style={{ marginLeft: '5px', verticalAlign: 'middle' }} />;
-    // };
-
     const resetForm = () => {
         setFormData({
             name: '', address: '',
@@ -70,37 +45,31 @@ export default function ClientManagement() {
         setEditClient(null);
         setShowForm(false);
     };
-
     const openCreate = () => {
         resetForm();
         setShowForm(true);
     };
-
     const openEdit = (client) => {
         setEditClient(client);
         setFormData({
             name: client.name || '',
             address: client.address || '',
             industry: client.industry || '',
-            logo: null // file input resets
+            logo: null 
         });
         setShowForm(true);
     };
-
     const openClientProjects = async (client) => {
         const projects = await api.getClientPartnerships(client.id);
         setSelectedClient(client);
         setClientProjects(projects || []);
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage({ text: '', error: false });
-
         try {
             const payload = { ...formData };
-            if (!payload.logo) delete payload.logo; // don't send null logo
-
+            if (!payload.logo) delete payload.logo; 
             if (editClient) {
                 await api.updateClient(editClient.id, payload);
                 setMessage({ text: 'Client updated successfully!', error: false });
@@ -114,7 +83,6 @@ export default function ClientManagement() {
             setMessage({ text: err.message || 'Failed to save client.', error: true });
         }
     };
-
     const handleDelete = async (id) => {
         const confirmed = await notification.confirm('Are you sure you want to delete this client?');
         if (!confirmed) return;
@@ -126,11 +94,7 @@ export default function ClientManagement() {
             notification.error('Failed to delete client.');
         }
     };
-
-
     if (loading) return <LoadingSpinner />;
-
-    // ──── CLIENT PROJECTS VIEW ────
     if (selectedClient) {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
@@ -149,12 +113,10 @@ export default function ClientManagement() {
                 >
                     Back to Clients
                 </button>
-
                 <div className="card" style={{ padding: '30px', borderTop: '6px solid var(--role-admin)' }}>
                     <h3 style={{ margin: '0 0 20px 0', fontWeight: '800' }}>
                         Projects for {selectedClient.name}
                     </h3>
-
                     {clientProjects.length === 0 ? (
                         <p style={{ color: '#999', padding: '40px 0', textAlign: 'center' }}>
                             No projects linked to this client yet.
@@ -204,7 +166,6 @@ export default function ClientManagement() {
                         <X size={24} />
                     </button>
                 </div>
-
                 {message.text && (
                     <div style={{
                         padding: '12px 16px', borderRadius: '10px', marginBottom: '30px',
@@ -213,7 +174,6 @@ export default function ClientManagement() {
                         fontSize: '0.9rem', fontWeight: '600'
                     }}>{message.text}</div>
                 )}
-
                 <form onSubmit={handleSubmit} className="grid grid-2">
                     <div className="flex-column" style={{ gridColumn: 'span 2' }}>
                         <label className="label">Client Corporate Name *</label>
@@ -225,7 +185,6 @@ export default function ClientManagement() {
                             required
                         />
                     </div>
-
                     <div className="flex-column" style={{ gridColumn: 'span 2' }}>
                         <label className="label">Corporate Address</label>
                         <input
@@ -235,7 +194,6 @@ export default function ClientManagement() {
                             placeholder="Rue de Marseille"
                         />
                     </div>
-
                     <div className="flex-column" style={{ gridColumn: 'span 2' }}>
                         <label className="label">Industry Sector</label>
                         <input
@@ -245,7 +203,6 @@ export default function ClientManagement() {
                             placeholder="e.g. Health"
                         />
                     </div>
-
                     <div className="flex-column" style={{ gridColumn: 'span 2' }}>
                         <label className="label">Logo</label>
                         <input
@@ -262,7 +219,6 @@ export default function ClientManagement() {
                             </div>
                         )}
                     </div>
-
                     <div className="flex" style={{ gap: '15px', marginTop: '30px', gridColumn: 'span 2' }}>
                         <button type="submit" className="btn" style={{ background: 'var(--role-admin)', flex: 1 }}>
                             {editClient ? 'Update Profile' : 'Add Client'}
@@ -275,8 +231,6 @@ export default function ClientManagement() {
             </div>
         );
     }
-
-    // ──── TABLE VIEW ────
     return (
         <div>
             {message.text && (
@@ -287,14 +241,12 @@ export default function ClientManagement() {
                     fontSize: '0.9rem', fontWeight: '600'
                 }}>{message.text}</div>
             )}
-
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
                 <p style={{ color: '#999', fontSize: '0.9rem' }}>{clients.length} client{clients.length !== 1 ? 's' : ''} registered</p>
                 <button onClick={openCreate} className="btn" style={{ background: 'var(--role-admin)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Plus size={18} /> Add Client
                 </button>
             </div>
-
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>

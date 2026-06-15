@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import * as api from '../services/api';
 import * as auth from '../services/auth';
 import { useNavigate } from 'react-router-dom';
-
 export default function NearbyPartnerships() {
     const [location, setLocation] = useState({ lat: null, lng: null });
     const [partnerships, setPartnerships] = useState([]);
@@ -12,7 +11,6 @@ export default function NearbyPartnerships() {
     const [radius, setRadius] = useState(10);
     const radiusRef = React.useRef(10);
     const navigate = useNavigate();
-
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -22,14 +20,12 @@ export default function NearbyPartnerships() {
                 navigate('/login');
             }
         };
-
         const detectLocation = () => {
             if (!navigator.geolocation) {
                 setError("Geolocation is not supported by your browser.");
                 setLoading(false);
                 return;
             }
-
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const coords = {
@@ -45,17 +41,13 @@ export default function NearbyPartnerships() {
                 }
             );
         };
-
         checkAuth();
     }, [navigate]);
-
     const fetchNearby = async (lat, lng, r = radius) => {
         setLoading(true);
 try {
             const data = await api.authenticatedGet(`partnerships/nearby?lat=${lat}&lng=${lng}&radius=${r}`);
             setPartnerships(data || []);
-
-            // Get AI summary
             if (data && data.length > 0) {
                 const aiResponse = await api.authenticatedPost('ai/summarize-nearby', {
                     partnerships: data,
@@ -71,7 +63,6 @@ try {
             setLoading(false);
         }
     };
-
     const handleRadiusChange = (e) => {
         const newRadius = Number(e.target.value);
         radiusRef.current = newRadius;
@@ -80,7 +71,6 @@ try {
             fetchNearby(location.lat, location.lng, newRadius);
         }
     };
-
     if (error) {
         return (
             <div className="container section">
@@ -92,7 +82,6 @@ try {
             </div>
         );
     }
-
     if (loading) {
         return (
             <div className="container section">
@@ -103,14 +92,12 @@ try {
             </div>
         );
     }
-
     return (
         <div className="container section">
             <header style={{ marginBottom: '40px' }}>
                 <p className="label">Proximity Analysis</p>
                 <h1>Nearby Partnerships<span style={{ color: 'var(--primary)' }}>.</span></h1>
             </header>
-
             <div className="grid grid-3" style={{ gap: '30px', alignItems: 'start' }}>
                 <div className="card" style={{ gridColumn: 'span 1', height: 'fit-content' }}>
                     <h3 style={{ marginBottom: '20px' }}>AI Insights</h3>
@@ -124,7 +111,6 @@ try {
                     }}>
                         {summary}
                     </div>
-
                     <div style={{ marginTop: '30px' }}>
                         <label className="label">Search Radius: {radius}km</label>
                         <input
@@ -141,7 +127,6 @@ try {
                         </div>
                     </div>
                 </div>
-
                 <div style={{ gridColumn: 'span 2' }}>
                     {partnerships.length > 0 ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>

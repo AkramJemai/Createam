@@ -1,58 +1,1 @@
-import React from 'react';
-import { Trash2 } from 'lucide-react';
-
-export default function AdminMembersTable({ users, handleDelete }) {
-    return (
-        <div className="card" style={{ padding: 0, overflow: 'hidden', marginTop: '30px' }}>
-            <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-                <h3 style={{ margin: 0 }}>Active Members</h3>
-            </div>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                    <tr style={{ background: '#f8f8f8', borderBottom: '1px solid #eee' }}>
-                        <th style={{ textAlign: 'left', padding: '15px' }} className="label">Full Name / Email</th>
-                        <th style={{ textAlign: 'left', padding: '15px' }} className="label">Position</th>
-                        <th style={{ textAlign: 'left', padding: '15px' }} className="label">System Role</th>
-                        <th style={{ textAlign: 'right', padding: '15px' }} className="label">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map(user => (
-                        <tr key={user.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                            <td style={{ padding: '15px' }}>
-                                <div style={{ fontWeight: '700' }}>{user.name}</div>
-                                <div style={{ fontSize: '12px', color: '#999' }}>{user.email}</div>
-                            </td>
-                            <td style={{ padding: '15px' }}>
-                                <div style={{ fontSize: '14px', color: '#333' }}>{user.job_title || 'General Member'}</div>
-                            </td>
-                            <td style={{ padding: '15px' }}>
-                                <span className="role-badge" style={{
-                                    textTransform: 'uppercase',
-                                    fontSize: '10px',
-                                    background: user.role === 'admin' ? 'var(--primary)' : user.role === 'chef' ? 'var(--role-chef)' : '#eee',
-                                    color: user.role === 'member' ? '#666' : 'white'
-                                }}>
-                                    {user.role === 'chef' ? 'Project Manager' : user.role}
-                                </span>
-                            </td>
-                            <td style={{ padding: '15px', textAlign: 'right' }}>
-                                <button
-                                    onClick={() => handleDelete(user.id)}
-                                    style={{ background: 'none', border: 'none', color: '#38a169', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px', marginLeft: 'auto' }}
-                                >
-                                    <Trash2 size={14} /> DELETE
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    {users.length === 0 && (
-                        <tr>
-                            <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: '#999' }}>No active member accounts found.</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-        </div>
-    );
-}
+import React from 'react';import { Trash2 } from 'lucide-react';export default function AdminMembersTable({ users, handleDelete }) {    return (        <div className="card" style={{ padding: 0, overflow: 'hidden', marginTop: '30px' }}>            <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>                <h3 style={{ margin: 0 }}>Active Members</h3>            </div>            <table style={{ width: '100%', borderCollapse: 'collapse' }}>                <thead>                    <tr style={{ background: '#f8f8f8', borderBottom: '1px solid #eee' }}>                        <th style={{ textAlign: 'left', padding: '15px' }} className="label">Full Name / Email</th>                        <th style={{ textAlign: 'left', padding: '15px' }} className="label">Position</th>                        <th style={{ textAlign: 'left', padding: '15px' }} className="label">System Role</th>                        <th style={{ textAlign: 'right', padding: '15px' }} className="label">Actions</th>                    </tr>                </thead>                <tbody>                    {users.map(user => (                        <tr key={user.id} style={{ borderBottom: '1px solid #f0f0f0' }}>                            <td style={{ padding: '15px' }}>                                <div style={{ fontWeight: '700' }}>{user.name}</div>                                <div style={{ fontSize: '12px', color: '#999' }}>{user.email}</div>                            </td>                            <td style={{ padding: '15px' }}>                                <div style={{ fontSize: '14px', color: '#333' }}>{user.job_title || 'General Member'}</div>                            </td>                            <td style={{ padding: '15px' }}>                                <span className="role-badge" style={{                                    textTransform: 'uppercase',                                    fontSize: '10px',                                    background: user.role === 'admin' ? 'var(--primary)' : user.role === 'chef' ? 'var(--role-chef)' : '#eee',                                    color: user.role === 'member' ? '#666' : 'white'                                }}>                                    {user.role === 'chef' ? 'Project Manager' : user.role}                                </span>                            </td>                            <td style={{ padding: '15px', textAlign: 'right' }}>                                <button                                    onClick={() => handleDelete(user.id)}                                    style={{ background: 'none', border: 'none', color: '#38a169', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px', marginLeft: 'auto' }}                                >                                    <Trash2 size={14} /> DELETE                                </button>                            </td>                        </tr>                    ))}                    {users.length === 0 && (                        <tr>                            <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: '#999' }}>No active member accounts found.</td>                        </tr>                    )}                </tbody>            </table>        </div>    );}

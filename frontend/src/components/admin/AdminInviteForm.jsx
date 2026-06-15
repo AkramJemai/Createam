@@ -1,86 +1,2 @@
-import React, { useState, useEffect } from 'react';
-import { UserPlus } from 'lucide-react';
-import * as api from '../../services/api';
-
-export default function AdminInviteForm({ inviteForm, setInviteForm, handleInviteSubmit, inviteStatus, roleColor, isChef = false }) {
-    const [jobTitles, setJobTitles] = useState([]);
-
-    useEffect(() => {
-        const loadTitles = async () => {
-            const data = await api.getJobTitles();
-            setJobTitles(data || []);
-        };
-        loadTitles();
-    }, []);
-
-    return (
-        <div className="card" style={{ padding: '40px', borderTop: `6px solid ${roleColor}`, boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
-            <div style={{ marginBottom: '30px' }}>
-                <h3 style={{ fontSize: '1.8rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <UserPlus size={28} /> {isChef ? 'Invite Team Member' : 'Invite New Member'}
-                </h3>
-                <p style={{ color: '#888' }}>
-                    {isChef
-                        ? 'Deploy a secure registration link for a new member.'
-                        : 'Deploy a secure registration link with a specific Job Title.'}
-                </p>
-            </div>
-
-            <form onSubmit={handleInviteSubmit}>
-                <div className="grid grid-3" style={{ gap: '20px', marginBottom: '30px' }}>
-                    <div className="flex-column">
-                        <label className="label">Identity Email</label>
-                        <input
-                            type="email"
-                            placeholder="colleague@agency.com"
-                            className="input-field"
-                            required
-                            value={inviteForm.email}
-                            onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                        />
-                    </div>
-                    <div className="flex-column">
-                        <label className="label">Authorization Role</label>
-                        <select
-                            className="input-field"
-                            value={inviteForm.role}
-                            onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value })}
-                            disabled={true} // Now roles are strictly assigned by hierarchy
-                        >
-                            <option value={isChef ? "member" : "chef"}>
-                                {isChef ? "Team Member" : "Project Manager"}
-                            </option>
-                        </select>
-                    </div>
-                    <div className="flex-column">
-                        <label className="label">Job Title</label>
-                        <select
-                            className="input-field"
-                            value={inviteForm.job_title}
-                            onChange={(e) => setInviteForm({ ...inviteForm, job_title: e.target.value })}
-                            required
-                            disabled={inviteForm.role === 'chef'}
-                        >
-                            <option value="" disabled>Select Job Title</option>
-                            {inviteForm.role === 'chef' ? (
-                                <option value="Project Manager">Project Manager</option>
-                            ) : (
-                                jobTitles.map(title => (
-                                    <option key={title.id} value={title.name}>{title.name}</option>
-                                ))
-                            )}
-                        </select>
-                    </div>
-                </div>
-                <div className="flex align-center justify-between">
-                    <p style={{ color: inviteStatus.error ? 'var(--primary)' : '#38A169', fontSize: '14px', fontWeight: '800' }}>
-                        {inviteStatus.message}
-                    </p>
-                    <button type="submit" className="btn" style={{ background: roleColor, height: '52px', padding: '0 40px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <UserPlus size={18} /> Dispatch Invitation Link
-                    </button>
-                </div>
-            </form>
-        </div>
-    );
-}
+import React, { useState, useEffect } from 'react';import { UserPlus } from 'lucide-react';import * as api from '../../services/api';export default function AdminInviteForm({ inviteForm, setInviteForm, handleInviteSubmit, inviteStatus, roleColor, isChef = false }) {    const [jobTitles, setJobTitles] = useState([]);    useEffect(() => {        const loadTitles = async () => {            const data = await api.getJobTitles();            setJobTitles(data || []);        };        loadTitles();    }, []);    return (        <div className="card" style={{ padding: '40px', borderTop: `6px solid ${roleColor}`, boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>            <div style={{ marginBottom: '30px' }}>                <h3 style={{ fontSize: '1.8rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '10px' }}>                    <UserPlus size={28} /> {isChef ? 'Invite Team Member' : 'Invite New Member'}                </h3>                <p style={{ color: '#888' }}>                    {isChef                        ? 'Deploy a secure registration link for a new member.'                        : 'Deploy a secure registration link with a specific Job Title.'}                </p>            </div>            <form onSubmit={handleInviteSubmit}>                <div className="grid grid-3" style={{ gap: '20px', marginBottom: '30px' }}>                    <div className="flex-column">                        <label className="label">Identity Email</label>                        <input                            type="email"                            placeholder="colleague@agency.com"                            className="input-field"                            required                            value={inviteForm.email}                            onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}                        />                    </div>                    <div className="flex-column">                        <label className="label">Authorization Role</label>                        <select                            className="input-field"                            value={inviteForm.role}                            onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value })}                            disabled={true} 
+                        >                            <option value={isChef ? "member" : "chef"}>                                {isChef ? "Team Member" : "Project Manager"}                            </option>                        </select>                    </div>                    <div className="flex-column">                        <label className="label">Job Title</label>                        <select                            className="input-field"                            value={inviteForm.job_title}                            onChange={(e) => setInviteForm({ ...inviteForm, job_title: e.target.value })}                            required                            disabled={inviteForm.role === 'chef'}                        >                            <option value="" disabled>Select Job Title</option>                            {inviteForm.role === 'chef' ? (                                <option value="Project Manager">Project Manager</option>                            ) : (                                jobTitles.map(title => (                                    <option key={title.id} value={title.name}>{title.name}</option>                                ))                            )}                        </select>                    </div>                </div>                <div className="flex align-center justify-between">                    <p style={{ color: inviteStatus.error ? 'var(--primary)' : '#38A169', fontSize: '14px', fontWeight: '800' }}>                        {inviteStatus.message}                    </p>                    <button type="submit" className="btn" style={{ background: roleColor, height: '52px', padding: '0 40px', display: 'flex', alignItems: 'center', gap: '10px' }}>                        <UserPlus size={18} /> Dispatch Invitation Link                    </button>                </div>            </form>        </div>    );}

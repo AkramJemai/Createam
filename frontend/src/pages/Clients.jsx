@@ -3,14 +3,12 @@ import { getClients } from '../services/api';
 import PartnershipModal from '../components/PartnershipModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { MapPin } from 'lucide-react';
-
 export default function Clients() {
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedClient, setSelectedClient] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-
     useEffect(() => {
         const load = async () => {
             const data = await getClients();
@@ -19,9 +17,7 @@ export default function Clients() {
         };
         load();
     }, []);
-
     const activeClients = (clients || []).filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
     return (
         <div>
             <div className="animate-slide-up">
@@ -34,14 +30,13 @@ export default function Clients() {
                     </p>
                 </div>
             </section>
-
             <section className="section" style={{ background: '#fff', marginTop: '-60px', borderRadius: '40px 40px 0 0', position: 'relative', zIndex: 10, minHeight: '60vh' }}>
                 <div className="container">
                     {loading ? (
                         <LoadingSpinner />
                     ) : (
                         <>
-                            {/* Search Bar */}
+                            {}
                             <div style={{ marginBottom: '40px' }}>
                                 <input
                                     type="text"
@@ -63,7 +58,6 @@ export default function Clients() {
                                     onBlur={(e) => e.target.style.borderColor = '#eee'}
                                 />
                             </div>
-
                             <div className="grid grid-3" style={{ gap: '30px' }}>
                                 {activeClients.map(client => (
                                     <div
@@ -96,7 +90,6 @@ export default function Clients() {
                                             <MapPin size={14} />
                                             <span>{client.address || 'Global'}</span>
                                         </div>
-
                                         <button
                                             onClick={() => {
                                                 setSelectedClient(client);
@@ -127,7 +120,6 @@ export default function Clients() {
                                     </div>
                                 ))}
                             </div>
-
                             {activeClients.length === 0 && (
                                 <div style={{ textAlign: 'center', padding: '100px 0' }}>
                                     <h2 style={{ color: '#ccc' }}>We currently do not have any clients.</h2>
@@ -138,7 +130,6 @@ export default function Clients() {
                 </div>
             </section>
             </div>
-
             <PartnershipModal 
                 client={selectedClient}
                 isOpen={showModal}

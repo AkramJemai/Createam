@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getPartnerships, getPartnershipCategories } from '../services/api';
-
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState(['All']);
   const [filter, setFilter] = useState('All');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
   useEffect(() => {
     const loadData = async () => {
       const [pData, cData] = await Promise.all([
@@ -21,20 +19,16 @@ export default function Home() {
     };
     loadData();
   }, []);
-
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
     setMousePos({ x: x * 30, y: y * 30 });
   };
-
   const filtered = filter === 'All' ? projects : projects.filter(p => p.cat === filter);
-
-
   return (
     <div className="home-page" style={{ background: '#f5f5f5', color: '#333', minHeight: '100vh', perspective: '1200px', overflowX: 'hidden' }}>
-      {/* MAIN SECTION - 3D Showcase with Video Background */}
+      {}
       <section
         className="section desktop-hero"
         onMouseMove={handleMouseMove}
@@ -47,7 +41,7 @@ export default function Home() {
           display: 'flex',
           alignItems: 'center'
         }}>
-        {/* Video Background */}
+        {}
         <video
           autoPlay
           muted
@@ -67,8 +61,7 @@ export default function Home() {
         >
           <source src="/assets/hero-background.mp4" type="video/mp4" />
         </video>
-
-        {/* Dark Overlay for Better Text Readability */}
+        {}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -78,9 +71,8 @@ export default function Home() {
           background: 'transparent',
           zIndex: 1
         }}></div>
-
         <div className="container" style={{ position: 'relative', zIndex: 4 }}>
-          {/* Mobile Hero Content */}
+          {}
           <div className="mobile-hero-content" style={{
             textAlign: 'center',
             padding: '40px 20px'
@@ -106,8 +98,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* 3D PORTFOLIO SECTION */}
+      {}
       <section className="section" style={{ paddingBottom: 'clamp(60px, 10vw, 160px)', position: 'relative', borderBottom: 'none' }}>
         <div className="container">
           <div className="flex align-center justify-between" style={{ marginBottom: 'clamp(40px, 8vw, 100px)', flexWrap: 'wrap', gap: '30px' }}>
@@ -115,7 +106,6 @@ export default function Home() {
               <h2 style={{ fontSize: 'clamp(1.75rem, 6vw, 4rem)', fontWeight: 900, margin: 0, letterSpacing: '-3px', textTransform: 'uppercase', color: '#8B2D7C' }}>Selected Works</h2>
               <span style={{ position: 'absolute', bottom: '-10px', left: 0, width: '80px', height: '3px', background: '#8B2D7C' }}></span>
             </div>
-
             <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '10px', flex: 1, minWidth: '200px' }}>
               {categories.map(cat => (
                 <button
@@ -143,7 +133,6 @@ export default function Home() {
               ))}
             </div>
           </div>
-
           <div className="grid grid-2" style={{ gap: 'clamp(40px, 8vw, 100px) clamp(20px, 4vw, 50px)' }}>
             {filtered.slice(0, 4).map((p) => (
               <Link to={`/partnership/${p.id}`} key={p.id} className="p-3d-card" style={{
@@ -161,7 +150,7 @@ export default function Home() {
                   background: '#f0f0f0',
                   transform: 'translateZ(0)',
                 }} className="card-container">
-                  {/* Video Background if available */}
+                  {}
                   {p.video && (
                     <video
                       autoPlay
@@ -181,7 +170,6 @@ export default function Home() {
                       <source src={p.video} type="video/mp4" />
                     </video>
                   )}
-
                   {!p.video && (
                     <img
                       src={p.img}
@@ -201,7 +189,7 @@ export default function Home() {
                       className="p-img"
                     />
                   )}
-                  {/* Floating Tag over image */}
+                  {}
                   <div style={{
                     position: 'absolute',
                     top: '16px',
@@ -220,7 +208,6 @@ export default function Home() {
                   }} className="floating-tag">
                     {p.cat}
                   </div>
-
                   <div style={{
                     position: 'absolute',
                     top: 0,
@@ -240,13 +227,11 @@ export default function Home() {
               </Link>
             ))}
           </div>
-
           {filtered.length === 0 && (
             <div style={{ textAlign: 'center', padding: 'clamp(80px, 15vw, 160px) 20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
-              <p className="label animate-pulse" style={{ color: '#444' }}>System Idle // Waiting for Data Input</p>
+              <p className="label animate-pulse" style={{ color: '#444' }}>System Idle 
             </div>
           )}
-
           <div style={{ textAlign: 'center', marginTop: 'clamp(60px, 10vw, 120px)' }}>
             <Link to="/partnership" className="btn" style={{
               background: 'transparent',
@@ -263,7 +248,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <style>{`
         @keyframes float {
             0% { transform: translateY(0px) rotate(0deg); }
@@ -277,7 +261,6 @@ export default function Home() {
         }
         .float-anim { animation: float 10s ease-in-out infinite; }
         .float-anim-reverse { animation: floatReverse 15s ease-in-out infinite; }
-
         /* Desktop-only 3D effects */
         @media (min-width: 769px) {
           .p-3d-card:hover .card-container {
@@ -296,7 +279,6 @@ export default function Home() {
               transform: translateX(10px);
           }
         }
-
         /* Hide desktop elements on mobile */
         @media (max-width: 768px) {
           .desktop-only {
@@ -309,7 +291,6 @@ export default function Home() {
             display: block !important;
           }
         }
-
         /* Show mobile hero content only on mobile */
         @media (min-width: 769px) {
           .mobile-hero-content {
@@ -320,4 +301,3 @@ export default function Home() {
     </div>
   );
 }
-

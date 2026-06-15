@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { FaInstagram, FaLinkedin, FaFacebook } from 'react-icons/fa';
-
 export default function Footer() {
   const navLinks = [
     { name: 'Home', to: '/' },
@@ -8,13 +7,11 @@ export default function Footer() {
     { name: 'Agency', to: '/agency' },
     { name: 'Contact', to: '/contact' }
   ];
-
   const legalLinks = [
     { name: 'Privacy Policy', to: '/privacy-policy' },
     { name: 'Terms of Service', to: '/terms-of-service' },
     { name: 'Staff Login', to: '/login' }
   ];
-
   return (
     <footer style={{
       background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
@@ -22,7 +19,7 @@ export default function Footer() {
       color: '#fff',
       padding: 'clamp(30px, 5vw, 40px) clamp(16px, 4vw, 64px)'
     }}>
-      {/* Main Grid */}
+      {}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
@@ -31,7 +28,7 @@ export default function Footer() {
         maxWidth: '1400px',
         margin: '0 auto 30px'
       }}>
-        {/* Brand Section */}
+        {}
         <div>
           <Link to="/" className="notranslate" translate="no" style={{
             fontSize: 18,
@@ -56,8 +53,7 @@ export default function Footer() {
             Interdisciplinary design studio crafting brands for the digital age.
           </p>
         </div>
-
-        {/* Links Section */}
+        {}
         <div>
           <p style={{
             fontSize: 10,
@@ -88,8 +84,7 @@ export default function Footer() {
             ))}
           </div>
         </div>
-
-        {/* Social Section */}
+        {}
         <div>
           <p style={{
             fontSize: 10,
@@ -152,8 +147,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Divider */}
+      {}
       <div style={{
         borderTop: '1px solid rgba(255,255,255,0.1)',
         paddingTop: 15,
@@ -200,4 +194,3 @@ export default function Footer() {
     </footer>
   );
 }
-

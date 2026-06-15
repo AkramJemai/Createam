@@ -1,235 +1,2 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import * as auth from '../services/auth';
-
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [attempts, setAttempts] = useState(0);
-  const [lockoutTime, setLockoutTime] = useState(null);
-  const [secondsRemaining, setSecondsRemaining] = useState(0);
-  const [roleColor, setRoleColor] = useState('var(--primary)');
-  const navigate = useNavigate();
-
-  // Dynamic role detection based on email (visual effect)
-  useEffect(() => {
-    const lowerEmail = email.toLowerCase();
-    if (lowerEmail.includes('admin')) {
-      setRoleColor('var(--role-admin)');
-    } else if (lowerEmail.includes('chef') || lowerEmail.includes('projet')) {
-      setRoleColor('var(--role-chef)');
-    } else if (lowerEmail.includes('team') || lowerEmail.includes('member')) {
-      setRoleColor('var(--role-member)');
-    } else {
-      setRoleColor('var(--primary)');
-    }
-  }, [email]);
-
-  // Lockout countdown timer
-  useEffect(() => {
-    if (!lockoutTime) return;
-
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.ceil((lockoutTime - now) / 1000);
-
-      if (remaining <= 0) {
-        setLockoutTime(null);
-        setSecondsRemaining(0);
-        setAttempts(0);
-        setError('');
-        clearInterval(interval);
-      } else {
-        setSecondsRemaining(remaining);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [lockoutTime]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await auth.login(email, password);
-      // Login now stores to localStorage automatically via auth.login()
-
-      // Role-based redirection
-      if (response.user.role === 'admin') {
-        navigate('/admin');
-      } else if (response.user.role === 'chef') {
-        navigate('/chef-dashboard');
-      } else if (response.user.role === 'member') {
-        navigate('/member-dashboard');
-      } else {
-        auth.logout();
-        setError('Unauthorized: Your role does not have a designated dashboard.');
-      }
-
-    } catch (err) {
-      const newAttempts = attempts + 1;
-      setAttempts(newAttempts);
-
-      // Lock account after 5 attempts for 1 minute
-      if (newAttempts >= 5) {
-        setLockoutTime(Date.now() + 60000); // 1 minute = 60000ms
-        setError('Account locked. Too many login attempts. Please try again in 1 minute.');
-      } else {
-        setError(err.message || 'Connection failed.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getAccentStyle = () => ({
-    borderColor: roleColor,
-    color: roleColor,
-    transition: 'var(--transition-smooth)'
-  });
-
-  return (
-    <div className="container section" style={{ maxWidth: '450px' }}>
-      <header style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <p className="label" style={{ color: roleColor, transition: 'var(--transition-smooth)' }}>
-          Secure Access Area
-        </p>
-        <h1 style={{ fontSize: '3rem' }}>
-          Identity<span style={{ color: roleColor, transition: 'var(--transition-smooth)' }}>.</span>
-        </h1>
-      </header>
-
-      <form
-        onSubmit={handleSubmit}
-        className="card"
-        style={{
-          padding: '40px',
-          boxShadow: `0 10px 40px -10px ${roleColor}22`,
-          borderTop: `4px solid ${roleColor}`,
-          transition: 'var(--transition-smooth)'
-        }}
-      >
-        <div style={{ marginBottom: '25px' }}>
-          <label className="label" style={{ color: roleColor, transition: 'var(--transition-smooth)' }}>Email Address</label>
-          <input
-            type="email"
-            style={{
-              width: '100%',
-              padding: '15px',
-              marginTop: '10px',
-              border: '1px solid #eee',
-              borderRadius: '4px',
-              outline: 'none',
-              focusBorderColor: roleColor
-            }}
-            value={email}
-            placeholder="name@agency.com"
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        <div style={{ marginBottom: '10px', position: 'relative' }}>
-          <label className="label" style={{ color: roleColor, transition: 'var(--transition-smooth)' }}>Password</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPassword ? "text" : "password"}
-              style={{
-                width: '100%',
-                padding: '15px',
-                marginTop: '10px',
-                border: '1px solid #eee',
-                borderRadius: '4px',
-                outline: 'none'
-              }}
-              value={password}
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: 'absolute',
-                right: '15px',
-                top: '25px',
-                background: 'none',
-                border: 'none',
-                color: '#999',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: 'bold'
-              }}
-            >
-              {showPassword ? "HIDE" : "SHOW"}
-            </button>
-          </div>
-        </div>
-
-        <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-          <Link
-            to="/forgot-password"
-            style={{ fontSize: '13px', color: '#999', textDecoration: 'none' }}
-          >
-            Forgot your password?
-          </Link>
-        </div>
-
-        {attempts > 0 && !error && (
-          <p style={{ fontSize: '12px', color: '#999', marginBottom: '20px' }}>
-            Failed attempts: {attempts}
-          </p>
-        )}
-
-        {error && (
-          <div style={{
-            color: 'var(--primary)',
-            fontSize: '14px',
-            marginBottom: '20px',
-            textAlign: 'center',
-            background: '#fff0f0',
-            padding: '10px',
-            borderRadius: '4px'
-          }}>
-            {error}
-            {lockoutTime && (
-              <div style={{ marginTop: '8px', fontWeight: 'bold' }}>
-                Try again in {secondsRemaining}s
-              </div>
-            )}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          className="btn"
-          disabled={loading || lockoutTime}
-          style={{
-            width: '100%',
-            cursor: lockoutTime ? 'not-allowed' : 'pointer',
-            background: lockoutTime ? '#ccc' : roleColor,
-            padding: '18px',
-            fontSize: '16px',
-            marginTop: '10px',
-            boxShadow: lockoutTime ? 'none' : `0 4px 14px 0 ${roleColor}33`,
-            transition: 'var(--transition-smooth)',
-            opacity: lockoutTime ? 0.6 : 1
-          }}
-        >
-          {lockoutTime ? `Locked (${secondsRemaining}s)` : loading ? 'Decrypting Access...' : 'Authenticate'}
-        </button>
-
-      </form>
-
-      <footer style={{ marginTop: '40px', textAlign: 'center', color: '#ccc', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px' }}>
-        <span className="notranslate" translate="no">Createam Agency</span> &copy; 2026
-      </footer>
-    </div>
-  );
-}
+import React, { useState, useEffect } from 'react';import { useNavigate, Link } from 'react-router-dom';import * as auth from '../services/auth';export default function Login() {  const [email, setEmail] = useState('');  const [password, setPassword] = useState('');  const [showPassword, setShowPassword] = useState(false);  const [error, setError] = useState('');  const [loading, setLoading] = useState(false);  const [attempts, setAttempts] = useState(0);  const [lockoutTime, setLockoutTime] = useState(null);  const [secondsRemaining, setSecondsRemaining] = useState(0);  const [roleColor, setRoleColor] = useState('var(--primary)');  const navigate = useNavigate();  useEffect(() => {    const lowerEmail = email.toLowerCase();    if (lowerEmail.includes('admin')) {      setRoleColor('var(--role-admin)');    } else if (lowerEmail.includes('chef') || lowerEmail.includes('projet')) {      setRoleColor('var(--role-chef)');    } else if (lowerEmail.includes('team') || lowerEmail.includes('member')) {      setRoleColor('var(--role-member)');    } else {      setRoleColor('var(--primary)');    }  }, [email]);  useEffect(() => {    if (!lockoutTime) return;    const interval = setInterval(() => {      const now = Date.now();      const remaining = Math.ceil((lockoutTime - now) / 1000);      if (remaining <= 0) {        setLockoutTime(null);        setSecondsRemaining(0);        setAttempts(0);        setError('');        clearInterval(interval);      } else {        setSecondsRemaining(remaining);      }    }, 1000);    return () => clearInterval(interval);  }, [lockoutTime]);  const handleSubmit = async (e) => {    e.preventDefault();    setLoading(true);    setError('');    try {      const response = await auth.login(email, password);      if (response.user.role === 'admin') {        navigate('/admin');      } else if (response.user.role === 'chef') {        navigate('/chef-dashboard');      } else if (response.user.role === 'member') {        navigate('/member-dashboard');      } else {        auth.logout();        setError('Unauthorized: Your role does not have a designated dashboard.');      }    } catch (err) {      const newAttempts = attempts + 1;      setAttempts(newAttempts);      if (newAttempts >= 5) {        setLockoutTime(Date.now() + 60000); 
+        setError('Account locked. Too many login attempts. Please try again in 1 minute.');      } else {        setError(err.message || 'Connection failed.');      }    } finally {      setLoading(false);    }  };  const getAccentStyle = () => ({    borderColor: roleColor,    color: roleColor,    transition: 'var(--transition-smooth)'  });  return (    <div className="container section" style={{ maxWidth: '450px' }}>      <header style={{ textAlign: 'center', marginBottom: '40px' }}>        <p className="label" style={{ color: roleColor, transition: 'var(--transition-smooth)' }}>          Secure Access Area        </p>        <h1 style={{ fontSize: '3rem' }}>          Identity<span style={{ color: roleColor, transition: 'var(--transition-smooth)' }}>.</span>        </h1>      </header>      <form        onSubmit={handleSubmit}        className="card"        style={{          padding: '40px',          boxShadow: `0 10px 40px -10px ${roleColor}22`,          borderTop: `4px solid ${roleColor}`,          transition: 'var(--transition-smooth)'        }}      >        <div style={{ marginBottom: '25px' }}>          <label className="label" style={{ color: roleColor, transition: 'var(--transition-smooth)' }}>Email Address</label>          <input            type="email"            style={{              width: '100%',              padding: '15px',              marginTop: '10px',              border: '1px solid #eee',              borderRadius: '4px',              outline: 'none',              focusBorderColor: roleColor            }}            value={email}            placeholder="name@agency.com"            onChange={(e) => setEmail(e.target.value)}            required          />        </div>        <div style={{ marginBottom: '10px', position: 'relative' }}>          <label className="label" style={{ color: roleColor, transition: 'var(--transition-smooth)' }}>Password</label>          <div style={{ position: 'relative' }}>            <input              type={showPassword ? "text" : "password"}              style={{                width: '100%',                padding: '15px',                marginTop: '10px',                border: '1px solid #eee',                borderRadius: '4px',                outline: 'none'              }}              value={password}              placeholder="Password"              onChange={(e) => setPassword(e.target.value)}              required            />            <button              type="button"              onClick={() => setShowPassword(!showPassword)}              style={{                position: 'absolute',                right: '15px',                top: '25px',                background: 'none',                border: 'none',                color: '#999',                cursor: 'pointer',                fontSize: '12px',                fontWeight: 'bold'              }}            >              {showPassword ? "HIDE" : "SHOW"}            </button>          </div>        </div>        <div style={{ textAlign: 'right', marginBottom: '20px' }}>          <Link            to="/forgot-password"            style={{ fontSize: '13px', color: '#999', textDecoration: 'none' }}          >            Forgot your password?          </Link>        </div>        {attempts > 0 && !error && (          <p style={{ fontSize: '12px', color: '#999', marginBottom: '20px' }}>            Failed attempts: {attempts}          </p>        )}        {error && (          <div style={{            color: 'var(--primary)',            fontSize: '14px',            marginBottom: '20px',            textAlign: 'center',            background: '#fff0f0',            padding: '10px',            borderRadius: '4px'          }}>            {error}            {lockoutTime && (              <div style={{ marginTop: '8px', fontWeight: 'bold' }}>                Try again in {secondsRemaining}s              </div>            )}          </div>        )}        <button          type="submit"          className="btn"          disabled={loading || lockoutTime}          style={{            width: '100%',            cursor: lockoutTime ? 'not-allowed' : 'pointer',            background: lockoutTime ? '#ccc' : roleColor,            padding: '18px',            fontSize: '16px',            marginTop: '10px',            boxShadow: lockoutTime ? 'none' : `0 4px 14px 0 ${roleColor}33`,            transition: 'var(--transition-smooth)',            opacity: lockoutTime ? 0.6 : 1          }}        >          {lockoutTime ? `Locked (${secondsRemaining}s)` : loading ? 'Decrypting Access...' : 'Authenticate'}        </button>      </form>      <footer style={{ marginTop: '40px', textAlign: 'center', color: '#ccc', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '2px' }}>        <span className="notranslate" translate="no">Createam Agency</span> &copy; 2026      </footer>    </div>  );}

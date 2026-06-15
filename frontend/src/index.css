@@ -2,55 +2,41 @@
   --bg: #ffffff;
   --text: #050505;
   --muted: #888888;
-
-  /* Harmonized High-End Palette */
-  --primary: #750250;       /* Deep Plum (Brand ID) */
-  --primary-soft: #fcf1f8;  /* Very soft plum tint */
-  --accent: #ff0055;        /* Vibrant Rose (Harmonizes with Plum better than Amber) */
+  --primary: #750250;       
+  --primary-soft: #fcf1f8;  
+  --accent: #ff0055;        
   --accent-glow: rgba(255, 0, 85, 0.4);
-
   --border: rgba(0, 0, 0, 0.08);
   --bg-dark: #0a0a0a;
   --bg-soft: #fafafa;
-
   --gradient-main: linear-gradient(135deg, #750250 0%, #ff0055 100%);
   --transition-smooth: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-
-  /* Role-based Colors (Harmonized) */
   --role-admin: #750250;
   --role-chef: #2d3436;
   --role-member: #00b894;
 }
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
 }
-
-/* Base resets - shared between desktop and mobile */
 a {
   text-decoration: none;
   color: inherit;
 }
-
 ul {
   list-style: none;
 }
-
 img {
   max-width: 100%;
   display: block;
 }
-
-/* Google Translate hiding - shared */
 #google_translate_element {
   position: absolute;
   left: -9999px;
@@ -58,7 +44,6 @@ img {
   height: 1px;
   overflow: hidden;
 }
-
 .goog-te-banner-frame.skiptranslate,
 iframe.goog-te-banner-frame,
 .skiptranslate iframe,
@@ -81,26 +66,21 @@ iframe.goog-te-banner-frame,
   display: none !important;
   visibility: hidden !important;
 }
-
 body {
   top: 0 !important;
 }
-
 html {
   margin-top: 0 !important;
   top: 0 !important;
 }
-
 body > .skiptranslate,
 body > iframe.skiptranslate,
 body > .VIpgJd-ZVi9od-ORHb {
   display: none !important;
 }
-
 .notranslate {
   unicode-bidi: isolate;
 }
-
 .goog-text-highlight {
   background-color: transparent !important;
   box-shadow: none !important;

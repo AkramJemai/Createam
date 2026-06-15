@@ -1,19 +1,15 @@
 <?php
-
 namespace App\Services;
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use RuntimeException;
-
 class GeminiService
 {
     private Client $client;
     private string $apiKey;
     private string $model;
     private string $endpoint;
-
     public function __construct(?Client $client = null)
     {
         $this->apiKey = (string) config('services.gemini.api_key');
@@ -24,17 +20,14 @@ class GeminiService
             'connect_timeout' => 10,
         ]);
     }
-
     public function generatePrompt(array $inputs): string
     {
         if ($this->apiKey === '') {
             throw new RuntimeException('Gemini API key is not configured.');
         }
-
         if ($this->model === '') {
             throw new RuntimeException('Gemini model is not configured.');
         }
-
         $payload = [
             'contents' => [
                 [
@@ -50,7 +43,6 @@ class GeminiService
                 'maxOutputTokens' => 1024,
             ],
         ];
-
         try {
             $response = $this->client->post($this->endpoint, [
                 'json' => $payload,
@@ -65,17 +57,13 @@ class GeminiService
         } catch (GuzzleException $exception) {
             throw new RuntimeException('Unable to reach Gemini. Please try again.', 0, $exception);
         }
-
         $data = json_decode((string) $response->getBody(), true);
         $prompt = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
-
         if (! is_string($prompt) || trim($prompt) === '') {
             throw new RuntimeException('Gemini returned an empty prompt.');
         }
-
         return trim($prompt);
     }
-
     private function buildInstruction(array $inputs): string
     {
         return implode("\n", [
@@ -97,22 +85,17 @@ class GeminiService
             'Rendering: ' . $inputs['rendering'],
         ]);
     }
-
     private function extractRequestError(RequestException $exception): string
     {
         $response = $exception->getResponse();
-
         if ($response === null) {
             return 'Unable to reach Gemini. Please try again.';
         }
-
         $data = json_decode((string) $response->getBody(), true);
         $message = $data['error']['message'] ?? null;
-
         if (is_string($message) && $message !== '') {
             return 'Gemini request failed: ' . $message;
         }
-
         return 'Gemini request failed. Please try again.';
     }
 }

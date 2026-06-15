@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getAgencyData } from '../services/api';
-
 export default function Agency() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         const loadAgency = async () => {
             const agencyData = await getAgencyData();
@@ -14,21 +12,17 @@ export default function Agency() {
         loadAgency();
         window.scrollTo(0, 0);
     }, []);
-
     if (loading) return (
         <div className="container section" style={{ textAlign: 'center', paddingTop: '100px' }}>
             <p className="label animate-pulse">Consulting Archives</p>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 300 }}>Assembling Agency Profile...</h2>
         </div>
     );
-
     if (!data) return <div className="container section">Information currently unavailable.</div>;
-
     const { info, timeline, team, stats } = data;
-
     return (
         <div className="animate-slide-up" style={{ background: '#fff' }}>
-            {/* HERO SECTION */}
+            {}
             <header className="section" style={{ background: '#000', color: '#fff', paddingTop: '100px', paddingBottom: '90px' }}>
                 <div className="container">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '60px' }}>
@@ -47,8 +41,7 @@ export default function Agency() {
                     </div>
                 </div>
             </header>
-
-            {/* ABOUT & STATS */}
+            {}
             <section className="section" style={{ background: '#fff', marginTop: '-60px', borderRadius: '40px 40px 0 0', position: 'relative', zIndex: 10 }}>
                 <div className="container">
                     <div className="grid grid-2" style={{ gap: '80px', alignItems: 'start' }}>
@@ -61,7 +54,6 @@ export default function Agency() {
                                 Established {info?.founded_year}
                             </p>
                         </div>
-
                         <div className="grid grid-2" style={{ gap: '20px' }}>
                             {stats?.map(stat => (
                                 <div key={stat.id} className="card" style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--bg-soft)', border: 'none' }}>
@@ -73,15 +65,13 @@ export default function Agency() {
                     </div>
                 </div>
             </section>
-
-            {/* TIMELINE SECTION */}
+            {}
             <section className="section" style={{ background: '#fcf8fa' }}>
                 <div className="container">
                     <header style={{ marginBottom: '80px', textAlign: 'center' }}>
                         <p className="label">Our Journey</p>
                         <h2 style={{ fontSize: '3rem', fontWeight: '800' }}>Milestones</h2>
                     </header>
-
                     {timeline && timeline.length > 0 ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '50px', maxWidth: '700px', margin: '0 auto' }}>
                             {timeline.map((item) => (
@@ -103,15 +93,13 @@ export default function Agency() {
                     )}
                 </div>
             </section>
-
-            {/* TEAM SECTION */}
+            {}
             <section className="section">
                 <div className="container">
                     <header style={{ marginBottom: '60px' }}>
                         <p className="label" style={{ color: 'var(--primary)' }}>Members</p>
                         <h2 style={{ fontSize: '3rem', fontWeight: '800' }}>The Creative Force</h2>
                     </header>
-
                     {team && team.length > 0 ? (
                         <div className="grid grid-3" style={{ gap: '40px' }}>
                             {team.map(member => (
@@ -128,8 +116,6 @@ export default function Agency() {
                     )}
                 </div>
             </section>
-
-
         </div>
     );
 }

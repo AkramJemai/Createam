@@ -1,6 +1,5 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
-
 export default function AdminContactsTable({ items, handleStatusUpdate, handleDelete }) {
     return (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>

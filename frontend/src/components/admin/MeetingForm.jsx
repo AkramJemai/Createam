@@ -1,6 +1,5 @@
 import React from 'react';
 import { Calendar, X, Send, Save } from 'lucide-react';
-
 export default function MeetingForm({ formData, setFormData, handleSave, setShowForm, editItem, roleColor, members, clients }) {
     return (
         <div className="card animate-slide-up" style={{ padding: '40px', borderTop: `6px solid ${roleColor}` }}>
@@ -84,7 +83,6 @@ export default function MeetingForm({ formData, setFormData, handleSave, setShow
                         style={{ resize: 'vertical' }}
                     />
                 </div>
-
                 <div className="flex" style={{ gap: '15px', marginTop: '20px', gridColumn: 'span 2' }}>
                     <button type="submit" className="btn" style={{ background: roleColor, display: 'flex', alignItems: 'center', gap: '8px' }}>
                         {editItem ? <Save size={18} /> : <Send size={18} />}

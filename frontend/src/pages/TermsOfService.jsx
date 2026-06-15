@@ -1,117 +1,1 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-
-const sectionStyle = {
-  marginBottom: '28px',
-  padding: '24px',
-  borderRadius: '16px',
-  background: '#fff',
-  border: '1px solid rgba(117, 2, 80, 0.08)',
-  boxShadow: '0 14px 36px rgba(0,0,0,0.04)'
-};
-
-const headingStyle = {
-  marginTop: 0,
-  marginBottom: '12px',
-  color: 'var(--primary)',
-  fontSize: '18px',
-  fontWeight: 800
-};
-
-export default function TermsOfService() {
-  const effectiveDate = 'April 26, 2026';
-
-  return (
-    <div className="container section" style={{ maxWidth: '920px' }}>
-      <div style={{ marginBottom: '34px' }}>
-        <p className="label" style={{ color: 'var(--primary)' }}>Legal Framework</p>
-        <h1 style={{ marginBottom: '12px' }}>Terms of Service</h1>
-        <p style={{ maxWidth: '760px', lineHeight: 1.7, color: '#555' }}>
-          Welcome to <span className="notranslate" translate="no">Createam</span>. These Terms of Service ("Terms") govern your access to and use of our agency platform, creative services, and collaborative tools.
-        </p>
-        <p style={{ fontSize: '13px', color: '#888' }}>Last Updated: {effectiveDate}</p>
-      </div>
-
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>1. Professional Service Agreement</h2>
-        <p>
-          By interacting with <span className="notranslate" translate="no">Createam</span>, whether as a visitor, a client, or an invited collaborator, you agree to comply with these terms. Our platform is designed to facilitate high-end creative production, and your use of it constitutes acceptance of these operational standards.
-        </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>2. Collaborative Workspace and Roles</h2>
-        <p>
-          Access to our internal production dashboards is strictly restricted to authorized personnel:
-        </p>
-        <ul style={{ lineHeight: 1.8, color: '#444', marginTop: '10px' }}>
-          <li><strong>Admins:</strong> Have full oversight and authority over the agency's data and project archiving.</li>
-          <li><strong>Project Managers (Chefs):</strong> Responsible for studio coordination, task delegation, and project finalization.</li>
-          <li><strong>Studio Members:</strong> Responsible for task execution and reporting through the provided dashboard.</li>
-        </ul>
-        <p style={{ marginTop: '10px' }}>
-          You are responsible for the security of your invitation links and authentication tokens. Unauthorized sharing of access is strictly prohibited.
-        </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>3. Project Lifecycle and Finalization</h2>
-        <p>
-          Our production workflow includes a definitive "Ready to Deploy" secondary status. Once a Project Manager marks a project as finalized:
-        </p>
-        <ul style={{ lineHeight: 1.8, color: '#444', marginTop: '10px' }}>
-          <li>The project is considered production-complete.</li>
-          <li>The Admin reserves the right to "Archive" the project, moving it from the active production queue to the public showcase.</li>
-          <li>Historical data of archived projects remains the property of <span className="notranslate" translate="no">Createam</span> for performance tracking.</li>
-        </ul>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>4. Intellectual Property and Creative Content</h2>
-        <p>
-          All creative assets, including but not limited to 3D models, packaging designs, source code, and branding strategies developed within our platform, are the property of <span className="notranslate" translate="no">Createam</span> and/or its clients as defined in specific project contracts.
-        </p>
-        <p>
-          Users may not scrape, reproduce, or commercially exploit our "Partnership" showcase or any internal project data without express written consent.
-        </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>5. Data Accuracy and Geolocation</h2>
-        <p>
-          We use geocoding services to accurately map client and partnership locations. While we strive for precision, we do not warrant the absolute accuracy of geographic data provided through third-party mapping APIs.
-        </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>6. Limitation of Liability</h2>
-        <p>
-          <span className="notranslate" translate="no">Createam</span> provides this platform on an "as-is" basis. We are not liable for production delays, data loss during transitions, or third-party service interruptions (including email delivery or map services).
-        </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>7. Termination</h2>
-        <p>
-          We reserve the right to revoke invitations or terminate account access for any user found to be in violation of these terms or interfering with the agency's production environment.
-        </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={headingStyle}>8. Contact</h2>
-        <p>
-          For legal inquiries regarding these terms, please reach out to our team at{' '}
-          <a href="mailto:contact@createam.tn" style={{ color: 'var(--primary)', fontWeight: 700 }}>
-            contact@createam.tn
-          </a>
-          .
-        </p>
-      </section>
-
-      <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginTop: '28px' }}>
-        <Link to="/privacy-policy" className="btn">Privacy Policy</Link>
-        <Link to="/contact" className="btn" style={{ background: '#111' }}>Inquiries</Link>
-      </div>
-    </div>
-  );
-}
+import React from 'react';import { Link } from 'react-router-dom';const sectionStyle = {  marginBottom: '28px',  padding: '24px',  borderRadius: '16px',  background: '#fff',  border: '1px solid rgba(117, 2, 80, 0.08)',  boxShadow: '0 14px 36px rgba(0,0,0,0.04)'};const headingStyle = {  marginTop: 0,  marginBottom: '12px',  color: 'var(--primary)',  fontSize: '18px',  fontWeight: 800};export default function TermsOfService() {  const effectiveDate = 'April 26, 2026';  return (    <div className="container section" style={{ maxWidth: '920px' }}>      <div style={{ marginBottom: '34px' }}>        <p className="label" style={{ color: 'var(--primary)' }}>Legal Framework</p>        <h1 style={{ marginBottom: '12px' }}>Terms of Service</h1>        <p style={{ maxWidth: '760px', lineHeight: 1.7, color: '#555' }}>          Welcome to <span className="notranslate" translate="no">Createam</span>. These Terms of Service ("Terms") govern your access to and use of our agency platform, creative services, and collaborative tools.        </p>        <p style={{ fontSize: '13px', color: '#888' }}>Last Updated: {effectiveDate}</p>      </div>      <section style={sectionStyle}>        <h2 style={headingStyle}>1. Professional Service Agreement</h2>        <p>          By interacting with <span className="notranslate" translate="no">Createam</span>, whether as a visitor, a client, or an invited collaborator, you agree to comply with these terms. Our platform is designed to facilitate high-end creative production, and your use of it constitutes acceptance of these operational standards.        </p>      </section>      <section style={sectionStyle}>        <h2 style={headingStyle}>2. Collaborative Workspace and Roles</h2>        <p>          Access to our internal production dashboards is strictly restricted to authorized personnel:        </p>        <ul style={{ lineHeight: 1.8, color: '#444', marginTop: '10px' }}>          <li><strong>Admins:</strong> Have full oversight and authority over the agency's data and project archiving.</li>          <li><strong>Project Managers (Chefs):</strong> Responsible for studio coordination, task delegation, and project finalization.</li>          <li><strong>Studio Members:</strong> Responsible for task execution and reporting through the provided dashboard.</li>        </ul>        <p style={{ marginTop: '10px' }}>          You are responsible for the security of your invitation links and authentication tokens. Unauthorized sharing of access is strictly prohibited.        </p>      </section>      <section style={sectionStyle}>        <h2 style={headingStyle}>3. Project Lifecycle and Finalization</h2>        <p>          Our production workflow includes a definitive "Ready to Deploy" secondary status. Once a Project Manager marks a project as finalized:        </p>        <ul style={{ lineHeight: 1.8, color: '#444', marginTop: '10px' }}>          <li>The project is considered production-complete.</li>          <li>The Admin reserves the right to "Archive" the project, moving it from the active production queue to the public showcase.</li>          <li>Historical data of archived projects remains the property of <span className="notranslate" translate="no">Createam</span> for performance tracking.</li>        </ul>      </section>      <section style={sectionStyle}>        <h2 style={headingStyle}>4. Intellectual Property and Creative Content</h2>        <p>          All creative assets, including but not limited to 3D models, packaging designs, source code, and branding strategies developed within our platform, are the property of <span className="notranslate" translate="no">Createam</span> and/or its clients as defined in specific project contracts.        </p>        <p>          Users may not scrape, reproduce, or commercially exploit our "Partnership" showcase or any internal project data without express written consent.        </p>      </section>      <section style={sectionStyle}>        <h2 style={headingStyle}>5. Data Accuracy and Geolocation</h2>        <p>          We use geocoding services to accurately map client and partnership locations. While we strive for precision, we do not warrant the absolute accuracy of geographic data provided through third-party mapping APIs.        </p>      </section>      <section style={sectionStyle}>        <h2 style={headingStyle}>6. Limitation of Liability</h2>        <p>          <span className="notranslate" translate="no">Createam</span> provides this platform on an "as-is" basis. We are not liable for production delays, data loss during transitions, or third-party service interruptions (including email delivery or map services).        </p>      </section>      <section style={sectionStyle}>        <h2 style={headingStyle}>7. Termination</h2>        <p>          We reserve the right to revoke invitations or terminate account access for any user found to be in violation of these terms or interfering with the agency's production environment.        </p>      </section>      <section style={sectionStyle}>        <h2 style={headingStyle}>8. Contact</h2>        <p>          For legal inquiries regarding these terms, please reach out to our team at{' '}          <a href="mailto:contact@createam.tn" style={{ color: 'var(--primary)', fontWeight: 700 }}>            contact@createam.tn          </a>          .        </p>      </section>      <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', marginTop: '28px' }}>        <Link to="/privacy-policy" className="btn">Privacy Policy</Link>        <Link to="/contact" className="btn" style={{ background: '#111' }}>Inquiries</Link>      </div>    </div>  );}

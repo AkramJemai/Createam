@@ -1,8 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
-
 export default function MemberHeader({ activeTab, roleColor, handleLogout }) {
-
     return (
         <header style={{ marginBottom: '60px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
@@ -11,7 +9,6 @@ export default function MemberHeader({ activeTab, roleColor, handleLogout }) {
                     {activeTab === 'prompt' ? 'Genius Prompt' : 'My Active Projects'}
                 </h1>
             </div>
-
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                 <button
                     onClick={handleLogout}

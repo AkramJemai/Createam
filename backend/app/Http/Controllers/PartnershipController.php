@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Partnership;
 use App\Models\PartnershipCategory;
 use App\Models\Client;
@@ -9,33 +7,27 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-
 class PartnershipController extends Controller
 {
     public function getAllPartnerships(Request $request)
     {
         $threeMonthsAgo = now()->subMonths(3);
-
         $partnerships = Partnership::all()->map(function ($p) use ($threeMonthsAgo) {
             $p->recent_clicks = $p->clickLogs()
                 ->where('created_at', '>=', $threeMonthsAgo)
                 ->count();
             return $p;
         });
-
         return response()->json($partnerships);
     }
-
     public function getPartnershipsByClient(Client $client)
     {
         return response()->json($client->partnerships()->latest()->get());
     }
-
     public function getPartnershipById(Partnership $partnership)
     {
         return response()->json($partnership);
     }
-
     public function createPartnership(Request $request)
     {
         $validated = $request->validate([
@@ -52,11 +44,9 @@ class PartnershipController extends Controller
             'description' => 'nullable|string',
             'status' => 'nullable|string',
         ]);
-
         if (!$request->hasFile('img') && !$request->hasFile('video') && !$request->hasFile('media')) {
             return response()->json(['message' => 'At least one media item is required.'], 422);
         }
-
         if ($request->hasFile('img')) {
             $file = $request->file('img');
             $ext = $file->getClientOriginalExtension();
@@ -64,7 +54,6 @@ class PartnershipController extends Controller
             $path = $file->storeAs('uploads/partnerships', $filename, 'public');
             $validated['img'] = $path;
         }
-
         if ($request->hasFile('video')) {
             $file = $request->file('video');
             $ext = $file->getClientOriginalExtension();
@@ -72,7 +61,6 @@ class PartnershipController extends Controller
             $videoPath = $file->storeAs('uploads/partnerships/videos', $filename, 'public');
             $validated['video'] = $videoPath;
         }
-
         if ($request->hasFile('media')) {
             $mediaPaths = [];
             foreach ($request->file('media') as $file) {
@@ -83,12 +71,10 @@ class PartnershipController extends Controller
             }
             $validated['media'] = $mediaPaths;
         }
-
         $validated['status'] = $validated['status'] ?? 'published';
         $partnership = Partnership::create($validated);
         return response()->json($partnership, 201);
     }
-
     public function updatePartnership(Request $request, Partnership $partnership)
     {
         $rules = [
@@ -101,34 +87,27 @@ class PartnershipController extends Controller
             'status' => 'sometimes|required|string',
             'description' => 'nullable|string',
         ];
-
         if ($request->hasFile('img')) {
             $rules['img'] = 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048';
         } else {
             $rules['img'] = 'nullable|string';
         }
-
         if ($request->hasFile('video')) {
             $rules['video'] = 'nullable|file|mimes:mp4,webm,ogg,quicktime|max:51200';
         } else {
             $rules['video'] = 'nullable|string';
         }
-
         if ($request->hasFile('media')) {
             $rules['media'] = 'nullable|array';
             $rules['media.*'] = 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:5120';
         }
-
         $validated = $request->validate($rules);
-
         $willHaveImg = ($request->hasFile('img')) || ($partnership->img && ($request->input('removeImg') !== 'true' && $request->input('removeImg') !== true));
         $willHaveVideo = ($request->hasFile('video')) || ($partnership->video && ($request->input('removeVideo') !== 'true' && $request->input('removeVideo') !== true));
         $willHaveMedia = $request->hasFile('media') || !empty($partnership->media);
-
         if (!$willHaveImg && !$willHaveVideo && !$willHaveMedia) {
             return response()->json(['message' => 'At least one media item is required.'], 422);
         }
-
         if ($request->hasFile('img')) {
             $file = $request->file('img');
             $ext = $file->getClientOriginalExtension();
@@ -142,7 +121,6 @@ class PartnershipController extends Controller
                 unset($validated['img']);
             }
         }
-
         if ($request->hasFile('video')) {
             $file = $request->file('video');
             $ext = $file->getClientOriginalExtension();
@@ -156,16 +134,13 @@ class PartnershipController extends Controller
                 unset($validated['video']);
             }
         }
-
         $existingMedia = json_decode($partnership->getRawOriginal('media') ?? '[]', true) ?: [];
-
         if ($request->has('removeMedia')) {
             $removeIndices = array_map('intval', (array) $request->input('removeMedia'));
             $existingMedia = array_values(array_filter($existingMedia, function ($_, $i) use ($removeIndices) {
                 return !in_array($i, $removeIndices);
             }, ARRAY_FILTER_USE_BOTH));
         }
-
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
                 $ext = $file->getClientOriginalExtension();
@@ -174,19 +149,15 @@ class PartnershipController extends Controller
                 $existingMedia[] = ['type' => 'photo', 'url' => $path];
             }
         }
-
         $validated['media'] = $existingMedia ?: null;
-
         $partnership->update($validated);
         return response()->json($partnership);
     }
-
     public function deletePartnership(Partnership $partnership)
     {
         $partnership->delete();
         return response()->json(null, 204);
     }
-
     public function getNearbyPartnerships(Request $request)
     {
         $request->validate([
@@ -194,11 +165,9 @@ class PartnershipController extends Controller
             'lng' => 'required|numeric|between:-180,180',
             'radius' => 'nullable|numeric|min:1',
         ]);
-
         $lat = $request->lat;
         $lng = $request->lng;
         $radius = (float) $request->get('radius', 10);
-
         $partnerships = Partnership::with('client')
             ->leftJoin('clients', 'partnerships.client_id', '=', 'clients.id')
             ->select('partnerships.*')
@@ -217,10 +186,8 @@ class PartnershipController extends Controller
                 [$lat, $lng, $lat]
             )
             ->get();
-
         return response()->json($partnerships);
     }
-
     private function geocodeAddress(?string $address, ?string $city = null, ?string $country = null): ?array
     {
         try {
@@ -228,13 +195,11 @@ class PartnershipController extends Controller
             if (empty($fullAddress)) {
                 return null;
             }
-
             $response = \Illuminate\Support\Facades\Http::get('https://nominatim.openstreetmap.org/search', [
                 'q' => $fullAddress,
                 'format' => 'json',
                 'limit' => 1,
             ]);
-
             if ($response->successful() && !empty($response->json())) {
                 $result = $response->json()[0];
                 return [
@@ -245,21 +210,17 @@ class PartnershipController extends Controller
         } catch (\Exception $e) {
             Log::warning('Geocoding failed for partnership: ' . $e->getMessage());
         }
-
         return null;
     }
-
     public function trackPartnershipClick(Partnership $partnership)
     {
         $partnership->increment('clicks');
         $partnership->clickLogs()->create();
         return response()->json(['clicks' => $partnership->fresh()->clicks]);
     }
-
     public function getTopClickedPartnershipsInPeriod()
     {
         $threeMonthsAgo = now()->subMonths(3);
-
         $topPartnerships = Partnership::select('partnerships.*')
             ->selectRaw('COUNT(partnership_clicks.id) as click_count')
             ->leftJoin('partnership_clicks', function ($join) use ($threeMonthsAgo) {
@@ -274,28 +235,23 @@ class PartnershipController extends Controller
                 $partnership->clicks = (int) $partnership->click_count;
                 return $partnership;
             });
-
         return response()->json($topPartnerships);
     }
-
     public function getAllCategories()
     {
         return response()->json(PartnershipCategory::all());
     }
-
     public function createCategory(Request $request)
     {
         $validated = $request->validate(['name' => 'required|string|unique:partnership_categories']);
         return response()->json(PartnershipCategory::create($validated), 201);
     }
-
     public function updateCategory(Request $request, PartnershipCategory $category)
     {
         $validated = $request->validate(['name' => 'required|string|unique:partnership_categories,name,' . $category->id]);
         $category->update($validated);
         return response()->json($category);
     }
-
     public function deleteCategory(PartnershipCategory $category)
     {
         $category->delete();

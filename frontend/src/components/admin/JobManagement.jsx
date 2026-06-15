@@ -2,38 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { Pencil, Trash2, Plus, X } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
 import * as api from '../../services/api';
-
 export default function JobManagement({ refreshData, roleColor }) {
     const [titles, setTitles] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [editItem, setEditItem] = useState(null);
     const [formName, setFormName] = useState('');
     const notification = useNotification();
-
     useEffect(() => {
         loadTitles();
     }, []);
-
     const loadTitles = async () => {
         const data = await api.getJobTitles();
         setTitles(data || []);
     };
-
     const handleOpenModal = (item = null) => {
         setEditItem(item);
         setFormName(item ? item.name : '');
         setShowModal(true);
     };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formName.trim()) return;
-
         const payload = { name: formName.trim() };
         const success = editItem
             ? await api.updateJobTitle(editItem.id, payload)
             : await api.createJobTitle(payload);
-
         if (success) {
             setShowModal(false);
             setEditItem(null);
@@ -44,7 +37,6 @@ export default function JobManagement({ refreshData, roleColor }) {
             notification.error('Failed to save. Please try again.');
         }
     };
-
     const handleDelete = async (id) => {
         const confirmed = await notification.confirm('Are you sure you want to delete this job title?');
         if (!confirmed) return;
@@ -56,7 +48,6 @@ export default function JobManagement({ refreshData, roleColor }) {
             notification.error('Delete failed.');
         }
     };
-
     return (
         <div className="animate-slide-up" style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
             <div className="card">
@@ -99,8 +90,7 @@ export default function JobManagement({ refreshData, roleColor }) {
                     </tbody>
                 </table>
             </div>
-
-            {/* Modal */}
+            {}
             {showModal && (
                 <div className="modal-overlay" style={{
                     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -137,7 +127,6 @@ export default function JobManagement({ refreshData, roleColor }) {
                                     }}
                                 />
                             </div>
-
                             <div className="flex gap-10">
                                 <button type="submit" className="btn" style={{ background: roleColor, flex: 1 }}>
                                     {editItem ? 'Save Changes' : 'Create Title'}

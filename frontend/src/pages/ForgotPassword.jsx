@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as auth from '../services/auth';
-
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
     setError('');
-
     try {
       const response = await auth.forgotPassword(email);
       setMessage(response.message);
@@ -24,7 +21,6 @@ export default function ForgotPassword() {
       setLoading(false);
     }
   };
-
   return (
     <div className="container section" style={{ maxWidth: '450px' }}>
       <header style={{ textAlign: 'center', marginBottom: '40px' }}>
@@ -35,7 +31,6 @@ export default function ForgotPassword() {
           Forgot Password<span style={{ color: 'var(--primary)' }}>.</span>
         </h1>
       </header>
-
       <form
         onSubmit={handleSubmit}
         className="card"
@@ -81,7 +76,6 @@ export default function ForgotPassword() {
                 required
               />
             </div>
-
             {error && (
               <div style={{
                 color: 'var(--primary)',
@@ -95,7 +89,6 @@ export default function ForgotPassword() {
                 {error}
               </div>
             )}
-
             <button
               type="submit"
               className="btn"
@@ -112,7 +105,6 @@ export default function ForgotPassword() {
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
-            
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <Link
                 to="/login"

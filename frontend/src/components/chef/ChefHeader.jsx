@@ -1,8 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
-
 export default function ChefHeader({ activeTab, setActiveTab, roleColor, handleLogout }) {
-
     return (
         <header style={{ marginBottom: '60px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
             <div>
@@ -11,7 +9,6 @@ export default function ChefHeader({ activeTab, setActiveTab, roleColor, handleL
                     {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
                 </h1>
             </div>
-
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                 <button
                     onClick={handleLogout}
@@ -38,4 +35,3 @@ export default function ChefHeader({ activeTab, setActiveTab, roleColor, handleL
         </header>
     );
 }
-

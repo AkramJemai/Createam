@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Rocket, X, Check } from 'lucide-react';
 import * as api from '../../services/api';
-
 export default function PartnershipForm({ formData, setFormData, handleSave, setShowForm, editItem, roleColor }) {
     const [partnershipCategories, setPartnershipCategories] = useState([]);
     const [clients, setClients] = useState([]);
     const [error, setError] = useState('');
     const [newFiles, setNewFiles] = useState([]);
     const [removedMediaIndices, setRemovedMediaIndices] = useState([]);
-
     useEffect(() => {
         const loadData = async () => {
             const [categoriesData, clientsData] = await Promise.all([
@@ -20,7 +18,6 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
         };
         loadData();
     }, []);
-
     const handleMediaChange = (e) => {
         const files = Array.from(e.target.files);
         const mapped = files.map(file => ({
@@ -31,44 +28,33 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
         setNewFiles(prev => [...prev, ...mapped]);
         e.target.value = '';
     };
-
     const removeNewFile = (index) => {
         setNewFiles(prev => prev.filter((_, i) => i !== index));
     };
-
     const handleSubmit = (e) => {
         e.preventDefault();
-
         const images = newFiles.filter(f => f.type === 'image');
         const videos = newFiles.filter(f => f.type === 'video');
-
         const existingImg = editItem && formData.img && !formData.removeImg;
         const existingVideo = editItem && formData.video && !formData.removeVideo;
-
         const willHaveImg = images.length > 0 || existingImg;
         const willHaveVideo = videos.length > 0 || existingVideo;
-
         if (!willHaveImg && !willHaveVideo) {
             setError('Please upload at least one image or video.');
             return;
         }
-
         const payload = { ...formData };
-
         if (existingImg) {
             if (images.length > 0) payload.media = images.map(f => f.file);
         } else {
             if (images[0]) payload.img = images[0].file;
             if (images.length > 1) payload.media = images.slice(1).map(f => f.file);
         }
-
         if (videos[0]) payload.video = videos[0].file;
         if (removedMediaIndices.length > 0) payload.removeMedia = removedMediaIndices;
-
         setError('');
         handleSave(e, payload);
     };
-
     return (
         <div className="card" style={{ padding: '40px', borderTop: `6px solid ${roleColor}` }}>
             {error && (
@@ -143,13 +129,11 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
                         onChange={e => setFormData({ ...formData, description: e.target.value })}
                     />
                 </div>
-
                 <div className="flex-column" style={{ gridColumn: 'span 2' }}>
                     <label className="label">Project Media</label>
                     <p style={{ fontSize: '0.8rem', color: '#999', margin: '4px 0 12px' }}>
                         Select multiple images and/or videos. First image = cover, first video = featured.
                     </p>
-
                     {editItem && (formData.img || formData.video || formData.media?.length > 0) && (
                         <div style={{ marginBottom: '15px' }}>
                             <p style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '8px', color: '#555' }}>Current media:</p>
@@ -183,7 +167,6 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
                             </div>
                         </div>
                     )}
-
                     {newFiles.length > 0 && (
                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px' }}>
                             {newFiles.map((item, index) => (
@@ -202,7 +185,6 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
                             ))}
                         </div>
                     )}
-
                     <input
                         className="input-field"
                         type="file"
@@ -214,7 +196,6 @@ export default function PartnershipForm({ formData, setFormData, handleSave, set
                         Images: JPEG, PNG, GIF (max 2MB) · Videos: MP4, WebM, MOV (max 50MB)
                     </p>
                 </div>
-
                 <div className="flex" style={{ gap: '15px', marginTop: '20px', gridColumn: 'span 2' }}>
                     <button type="submit" className="btn" style={{ background: roleColor, display: 'flex', alignItems: 'center', gap: '8px' }}>
                         {editItem ? <Check size={18} /> : <Rocket size={18} />}

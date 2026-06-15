@@ -1,6 +1,5 @@
 import React from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
-
 export default function AdminMeetingsTable({ items, openEdit, handleDelete }) {
     return (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>

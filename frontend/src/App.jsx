@@ -22,94 +22,67 @@ import Clients from './pages/Clients.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import * as auth from './services/auth';
-
-// Dynamically load desktop or mobile CSS based on screen width
 function useResponsiveCSS() {
   const [cssLoaded, setCssLoaded] = useState(false);
-
   useEffect(() => {
     const loadCSS = () => {
       const isMobile = window.innerWidth <= 768;
       const cssPath = isMobile ? '/mobile.css' : '/desktop.css';
-
-      // Remove existing responsive CSS link if present
       const existingLink = document.getElementById('responsive-css');
       if (existingLink) {
         existingLink.remove();
       }
-
-      // Create new link
       const link = document.createElement('link');
       link.id = 'responsive-css';
       link.rel = 'stylesheet';
       link.href = cssPath;
       link.onload = () => setCssLoaded(true);
-
       document.head.appendChild(link);
     };
-
-    // Initial load
     loadCSS();
-
-    // Listen for window resize
     const handleResize = () => {
       loadCSS();
     };
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   return cssLoaded;
 }
-
 const BRAND_TAB_TITLE = 'Createam';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
+      staleTime: 1000 * 60 * 5, 
+      gcTime: 1000 * 60 * 10, 
     },
   },
 });
-
 function AppContent() {
   const location = useLocation();
   const isDashboardPath =
     location.pathname.startsWith('/admin') ||
     location.pathname.startsWith('/chef-dashboard') ||
     location.pathname.startsWith('/member-dashboard');
-
-  // Load responsive CSS
   useResponsiveCSS();
-
-  // Auto-restore session on app load
   useEffect(() => {
     const restoreSession = async () => {
       try {
         if (auth.isAuthenticated()) {
-          // Verify the token is still valid with the backend
           await auth.verifySession();
         }
       } catch (err) {
-        // Token expired or invalid, clean up
         auth.logout();
       }
     };
-
     restoreSession();
   }, []);
-
-  // Keep the brand title fixed in the browser tab, even when auto-translation runs.
   useEffect(() => {
     const enforceBrandTitle = () => {
       if (document.title !== BRAND_TAB_TITLE) {
         document.title = BRAND_TAB_TITLE;
       }
     };
-
     enforceBrandTitle();
-
     const titleNode = document.querySelector('head > title');
     const observer = new MutationObserver(enforceBrandTitle);
     if (titleNode) {
@@ -119,15 +92,12 @@ function AppContent() {
         subtree: true,
       });
     }
-
     window.addEventListener('pageshow', enforceBrandTitle);
-
     return () => {
       observer.disconnect();
       window.removeEventListener('pageshow', enforceBrandTitle);
     };
   }, []);
-
   return (
     <>
       <ScrollToTop />
@@ -156,7 +126,6 @@ function AppContent() {
     </>
   );
 }
-
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>

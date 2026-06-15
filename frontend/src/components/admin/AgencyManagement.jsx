@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Trash2, Pencil, RefreshCw, Save } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
 import * as api from '../../services/api';
-
 export default function AgencyManagement() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -10,28 +9,22 @@ export default function AgencyManagement() {
     const [editingTimeline, setEditingTimeline] = useState(null);
     const [editingTeam, setEditingTeam] = useState(null);
     const notification = useNotification();
-
     useEffect(() => {
         loadData();
     }, []);
-
     useEffect(() => {
         if (!message.text || message.error) return;
-
         const timer = setTimeout(() => {
             setMessage({ text: '', error: false });
         }, 5000);
-
         return () => clearTimeout(timer);
     }, [message.text, message.error]);
-
     const loadData = async () => {
         setLoading(true);
         const res = await api.getAgencyData();
         if (res) setData(res);
         setLoading(false);
     };
-
     const handleInfoUpdate = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -40,9 +33,7 @@ export default function AgencyManagement() {
             about_text: formData.get('about_text'),
             founded_year: formData.get('founded_year'),
         };
-
         try {
-            // Need to add updateAgencyInfo to api.js
             await api.authenticatedPut('agency/info', payload);
             setMessage({ text: 'Agency info updated successfully!', error: false });
             loadData();
@@ -50,7 +41,6 @@ export default function AgencyManagement() {
             setMessage({ text: 'Update failed.', error: true });
         }
     };
-
     const handleAddStat = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -58,7 +48,6 @@ export default function AgencyManagement() {
             label: formData.get('label'),
             value: formData.get('value'),
         };
-
         try {
             await api.authenticatedPost('agency/stats', payload);
             e.target.reset();
@@ -67,14 +56,12 @@ export default function AgencyManagement() {
             setMessage({ text: 'Failed to add stat.', error: true });
         }
     };
-
     const handleDeleteStat = async (id) => {
         const confirmed = await notification.confirm('Are you sure you want to delete this agency stat? This action cannot be undone.');
         if (!confirmed) return;
         await api.authenticatedDelete(`agency/stats/${id}`);
         loadData();
     };
-
     const handleAddTimeline = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -83,7 +70,6 @@ export default function AgencyManagement() {
             title: formData.get('title'),
             description: formData.get('description'),
         };
-
         try {
             await api.authenticatedPost('agency/timeline', payload);
             e.target.reset();
@@ -93,7 +79,6 @@ export default function AgencyManagement() {
             setMessage({ text: 'Failed to add milestone.', error: true });
         }
     };
-
     const handleDeleteTimeline = async (id) => {
         const confirmed = await notification.confirm('Are you sure you want to delete this milestone? This action cannot be undone.');
         if (!confirmed) return;
@@ -101,7 +86,6 @@ export default function AgencyManagement() {
         notification.success('Milestone deleted.');
         loadData();
     };
-
     const handleAddTeam = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -109,7 +93,6 @@ export default function AgencyManagement() {
             name: formData.get('name'),
             role: formData.get('role'),
         };
-
         try {
             await api.authenticatedPost('agency/team', payload);
             e.target.reset();
@@ -119,7 +102,6 @@ export default function AgencyManagement() {
             setMessage({ text: 'Failed to add team member.', error: true });
         }
     };
-
     const handleDeleteTeam = async (id) => {
         const confirmed = await notification.confirm('Are you sure you want to delete this team member? This action cannot be undone.');
         if (!confirmed) return;
@@ -127,9 +109,7 @@ export default function AgencyManagement() {
         notification.success('Team member deleted.');
         loadData();
     };
-
     if (loading) return <div>Loading agency management...</div>;
-
     return (
         <div className="agency-management">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -138,7 +118,6 @@ export default function AgencyManagement() {
                     <RefreshCw size={18} /> Refresh Data
                 </button>
             </div>
-            
             {message.text && (
                 <div style={{ 
                     padding: '15px', 
@@ -150,9 +129,8 @@ export default function AgencyManagement() {
                     {message.text}
                 </div>
             )}
-
             <div className="grid grid-2" style={{ gap: '40px' }}>
-                {/* INFO SECTION */}
+                {}
                 <div className="card animate-slide-up" style={{ borderTop: '6px solid var(--primary)', padding: '40px' }}>
                     <h3 style={{ marginBottom: '30px', fontWeight: '800' }}>General Agency Profile</h3>
                     <form onSubmit={handleInfoUpdate} className="flex-column" style={{ gap: '20px' }}>
@@ -173,8 +151,7 @@ export default function AgencyManagement() {
                         </button>
                     </form>
                 </div>
-
-                {/* STATS SECTION */}
+                {}
                 <div className="card animate-slide-up" style={{ borderTop: '6px solid var(--primary)', padding: '40px' }}>
                     <h3 style={{ marginBottom: '30px', fontWeight: '800' }}>Key Performance Stats</h3>
                     <div style={{ marginBottom: '30px' }}>
@@ -211,7 +188,6 @@ export default function AgencyManagement() {
                     </form>
                 </div>
             </div>
-
             <div style={{ marginTop: '40px' }} className="card animate-slide-up">
                 <div style={{ padding: '40px', borderBottom: '1px solid #eee' }}>
                     <h3 style={{ margin: 0, fontWeight: '800' }}>Agency Timeline & Milestones</h3>
@@ -234,7 +210,6 @@ export default function AgencyManagement() {
                             </div>
                         ))}
                     </div>
-
                     <form onSubmit={handleAddTimeline} style={{ background: '#fafafa', padding: '35px', borderRadius: '15px', border: '1px solid #eee' }}>
                         <h4 style={{ margin: '0 0 25px 0', fontWeight: '800', fontSize: '1rem', color: 'var(--primary)' }}>Log New Milestone</h4>
                         <div className="grid grid-2" style={{ gap: '20px', marginBottom: '20px' }}>
@@ -255,7 +230,6 @@ export default function AgencyManagement() {
                     </form>
                 </div>
             </div>
-
             <div style={{ marginTop: '40px' }} className="card animate-slide-up">
                 <div style={{ padding: '40px', borderBottom: '1px solid #eee' }}>
                     <h3 style={{ margin: 0, fontWeight: '800' }}>Core Agency Team</h3>
@@ -277,7 +251,6 @@ export default function AgencyManagement() {
                             </div>
                         ))}
                     </div>
-
                     <form onSubmit={handleAddTeam} style={{ background: '#fafafa', padding: '35px', borderRadius: '15px', border: '1px solid #eee' }}>
                         <h4 style={{ margin: '0 0 25px 0', fontWeight: '800', fontSize: '1rem', color: 'var(--primary)' }}>Add New Member</h4>
                         <div className="grid grid-2" style={{ gap: '20px', marginBottom: '20px' }}>
@@ -290,7 +263,6 @@ export default function AgencyManagement() {
                                 <input name="role" placeholder="e.g. Creative Director" className="input-field" required />
                             </div>
                         </div>
-
                         <button className="btn" style={{ background: 'var(--primary)', padding: '15px 40px' }}>Enrol Member</button>
                     </form>
                 </div>

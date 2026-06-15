@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import * as api from '../../services/api';
-
 export default function AdminTaskBoard({ projects, roleColor }) {
     const [selectedProject, setSelectedProject] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-
     useEffect(() => {
         if (selectedProject) {
             api.getTasks({ meeting_id: selectedProject.id }).then(data => setTasks(data || []));
         }
     }, [selectedProject]);
-
     const activeProjects = projects.filter(p => p.is_project);
-
     if (!selectedProject) {
         return (
             <div className="card animate-slide-up" style={{ padding: '60px', textAlign: 'center' }}>
@@ -47,7 +43,6 @@ export default function AdminTaskBoard({ projects, roleColor }) {
             </div>
         );
     }
-
     return (
         <div className="animate-slide-up">
             <div className="flex align-center justify-between" style={{ marginBottom: '40px' }}>
@@ -62,7 +57,6 @@ export default function AdminTaskBoard({ projects, roleColor }) {
                     <p style={{ color: '#888', margin: '4px 0 0', fontSize: '0.9rem' }}>{selectedProject.client_name}</p>
                 </div>
             </div>
-
             <div style={{ marginBottom: '30px' }}>
                 <input
                     type="text"
@@ -73,7 +67,6 @@ export default function AdminTaskBoard({ projects, roleColor }) {
                     style={{ width: '100%', maxWidth: '400px' }}
                 />
             </div>
-
             <div className="grid grid-3" style={{ gap: '30px' }}>
                 {['todo', 'in_progress', 'done'].map(status => {
                     const filteredTasks = tasks.filter(t =>
@@ -90,7 +83,6 @@ export default function AdminTaskBoard({ projects, roleColor }) {
                                 {filteredTasks.length}
                             </span>
                         </div>
-
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             {filteredTasks.map(task => (
                                 <div key={task.id} className="card" style={{ padding: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', borderLeft: `4px solid ${task.priority === 'high' ? '#ff4d4d' : task.priority === 'medium' ? '#fea624' : '#38a169'}` }}>
@@ -98,7 +90,6 @@ export default function AdminTaskBoard({ projects, roleColor }) {
                                         <h4 style={{ margin: 0, fontSize: '1rem' }}>{task.title}</h4>
                                     </div>
                                     <p style={{ fontSize: '0.85rem', color: '#666', margin: '0 0 15px 0' }}>{task.description}</p>
-
                                     <div className="flex justify-between align-center">
                                         <div className="flex align-center" style={{ gap: '8px' }}>
                                             <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: roleColor, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 'bold' }}>
@@ -117,7 +108,6 @@ export default function AdminTaskBoard({ projects, roleColor }) {
                     );
                 })}
             </div>
-
         </div>
     );
 }

@@ -1,30 +1,22 @@
 import React, { createContext, useState, useCallback } from 'react';
 import { X, AlertCircle, CheckCircle, Info } from 'lucide-react';
-
 export const NotificationContext = createContext();
-
 export function NotificationProvider({ children }) {
     const [notifications, setNotifications] = useState([]);
-
     const showNotification = useCallback((message, type = 'info', duration = 5000) => {
         const id = Date.now();
         const notification = { id, message, type };
-
         setNotifications(prev => [...prev, notification]);
-
         if (duration > 0) {
             setTimeout(() => {
                 setNotifications(prev => prev.filter(n => n.id !== id));
             }, duration);
         }
-
         return id;
     }, []);
-
     const closeNotification = useCallback((id) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
     }, []);
-
     const showConfirmDialog = useCallback((message) => {
         return new Promise((resolve) => {
             const id = Date.now();
@@ -43,7 +35,6 @@ export function NotificationProvider({ children }) {
             }]);
         });
     }, []);
-
     return (
         <NotificationContext.Provider value={{ showNotification, closeNotification, showConfirmDialog }}>
             {children}
@@ -51,7 +42,6 @@ export function NotificationProvider({ children }) {
         </NotificationContext.Provider>
     );
 }
-
 function NotificationContainer({ notifications, closeNotification }) {
     return (
         <div style={{ position: 'fixed', top: '20px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '400px' }}>
@@ -65,14 +55,11 @@ function NotificationContainer({ notifications, closeNotification }) {
         </div>
     );
 }
-
 function Toast({ notification, closeNotification }) {
     const bgColor = notification.type === 'error' ? '#fee2e2' : notification.type === 'success' ? '#dcfce7' : '#eff6ff';
     const textColor = notification.type === 'error' ? '#991b1b' : notification.type === 'success' ? '#166534' : '#1e40af';
     const borderColor = notification.type === 'error' ? '#fca5a5' : notification.type === 'success' ? '#86efac' : '#93c5fd';
-
     const Icon = notification.type === 'error' ? AlertCircle : notification.type === 'success' ? CheckCircle : Info;
-
     return (
         <div style={{
             background: bgColor,
@@ -122,7 +109,6 @@ function Toast({ notification, closeNotification }) {
         </div>
     );
 }
-
 function ConfirmDialog({ notification }) {
     return (
         <div style={{

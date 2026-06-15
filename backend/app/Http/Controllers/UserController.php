@@ -1,23 +1,1 @@
-<?php
-
-namespace App\Http\Controllers;
-
-use App\Models\User;
-
-class UserController extends Controller
-{
-    public function getAllUsers()
-    {
-        return response()->json(User::latest()->get());
-    }
-
-    public function deleteUser(User $user)
-    {
-        if (auth()->id() === $user->id) {
-            return response()->json(['message' => 'Cannot delete your own account'], 403);
-        }
-
-        $user->delete();
-        return response()->json(null, 204);
-    }
-}
+<?phpnamespace App\Http\Controllers;use App\Models\User;class UserController extends Controller{    public function getAllUsers()    {        return response()->json(User::latest()->get());    }    public function deleteUser(User $user)    {        if (auth()->id() === $user->id) {            return response()->json(['message' => 'Cannot delete your own account'], 403);        }        $user->delete();        return response()->json(null, 204);    }}

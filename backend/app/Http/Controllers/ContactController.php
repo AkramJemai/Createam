@@ -1,20 +1,16 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-
 class ContactController extends Controller
 {
     public function getAllContacts()
     {
         return response()->json(Contact::latest()->get());
     }
-
     public function createContact(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -23,11 +19,9 @@ class ContactController extends Controller
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:5000',
         ]);
-
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
         try {
             $contact = Contact::create([
                 'full_name' => $request->FullName,
@@ -36,11 +30,9 @@ class ContactController extends Controller
                 'message' => $request->message,
                 'status' => 'Received',
             ]);
-
             try {
                 $firstName = explode(' ', $contact->full_name)[0];
                 $refNum = $contact->getReferenceNumber();
-
                 Mail::raw(
                     "Hello {$firstName},\n\n" .
                     "Thank you for reaching out to Createam Agency! We've successfully received your message and our team is reviewing it now.\n\n" .
@@ -55,7 +47,6 @@ class ContactController extends Controller
             } catch (\Exception $e) {
                 Log::warning('Email failed but form was saved: ' . $e->getMessage());
             }
-
             return response()->json([
                 'success' => true,
                 'id' => $contact->id,
@@ -67,31 +58,25 @@ class ContactController extends Controller
             return response()->json(['error' => 'Failed to submit contact form.'], 500);
         }
     }
-
     public function updateContactStatus(Request $request, Contact $contact)
     {
         $validator = Validator::make($request->all(), [
             'status' => 'required|in:Pending,Received,In Progress,Resolved,Closed',
             'admin_reply' => 'nullable|string|max:5000',
         ]);
-
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
         try {
             $newStatus = $request->status;
             $adminReply = $request->admin_reply;
-
             $contact->update([
                 'status' => $newStatus,
                 'admin_reply' => $adminReply,
             ]);
-
             try {
                 $firstName = explode(' ', $contact->full_name)[0];
                 $refNum = $contact->getReferenceNumber();
-
                 if ($newStatus === 'In Progress') {
                     Mail::raw(
                         "Hello {$firstName},\n\n" .
@@ -108,16 +93,13 @@ class ContactController extends Controller
                     $bodyText = "Hello {$firstName},\n\n" .
                                 "Your request has been successfully resolved!\n\n" .
                                 "Reference Number: {$refNum}\n\n";
-
                     if ($adminReply) {
                         $bodyText .= "Our Response:\n{$adminReply}\n\n";
                     } else {
                         $bodyText .= "Thank you for reaching out. We appreciate your inquiry and hope everything is working well now.\n\n";
                     }
-
                     $bodyText .= "If you have any further questions or need additional assistance, feel free to reach out at contact@createam.tn.\n\n" .
                                  "Best regards,\nCreateam Agency Team";
-
                     Mail::raw($bodyText, function ($message) use ($contact, $refNum) {
                         $message->to($contact->email)
                                 ->subject("Your request has been resolved — {$refNum}");
@@ -126,7 +108,6 @@ class ContactController extends Controller
             } catch (\Exception $e) {
                 Log::warning('Status update email failed: ' . $e->getMessage());
             }
-
             return response()->json([
                 'success' => true,
                 'contact' => $contact,
@@ -137,7 +118,6 @@ class ContactController extends Controller
             return response()->json(['error' => 'Failed to update contact.'], 500);
         }
     }
-
     public function deleteContact(Contact $contact)
     {
         $contact->delete();

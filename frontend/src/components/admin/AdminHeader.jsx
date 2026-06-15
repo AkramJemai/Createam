@@ -1,6 +1,5 @@
 import React from 'react';
 import { LogOut, Plus } from 'lucide-react';
-
 export default function AdminHeader({ activeTab, openCreate, showForm, roleColor, handleLogout }) {
     return (
         <header style={{ marginBottom: '60px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -9,7 +8,6 @@ export default function AdminHeader({ activeTab, openCreate, showForm, roleColor
                     {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
                 </h1>
             </div>
-
             <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
                 <button
                     onClick={handleLogout}

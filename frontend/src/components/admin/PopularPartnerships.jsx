@@ -1,9 +1,7 @@
 import React from 'react';
 import { Eye, Rocket, TrendingUp } from 'lucide-react';
-
 export default function PopularPartnerships({ projects }) {
     if (!projects || projects.length === 0) return null;
-
     return (
         <div className="card animate-slide-up" style={{ 
             marginTop: '40px', 
@@ -29,7 +27,6 @@ export default function PopularPartnerships({ projects }) {
                     Live Tracking
                 </div>
             </div>
-            
             <div className="grid grid-3" style={{ gap: '25px' }}>
                 {projects.map((proj, idx) => (
                     <div key={proj.id} style={{ 
@@ -63,12 +60,10 @@ export default function PopularPartnerships({ projects }) {
                         }}>
                             {idx + 1}
                         </div>
-                        
                         <div>
                             <span className="label" style={{ fontSize: '0.75rem', letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--primary)', opacity: 0.8 }}>{proj.cat}</span>
                             <h4 style={{ margin: '10px 0 5px 0', fontSize: '1.3rem', fontWeight: '800', lineHeight: 1.2 }}>{proj.title}</h4>
                         </div>
-                        
                         <div style={{ 
                             marginTop: '25px', 
                             display: 'flex', 
