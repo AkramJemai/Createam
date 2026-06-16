@@ -10,11 +10,16 @@ class Partnership extends Model
         'cat',
         'img',
         'video',
+        'media',
         'year',
         'month',
         'clicks',
         'status',
         'description',
+    ];
+
+    protected $casts = [
+        'media' => 'array',
     ];
     public function getImgAttribute($value)
     {

@@ -86,6 +86,8 @@ export default function ClientManagement() {
     const handleDelete = async (id) => {
         const confirmed = await notification.confirm('Are you sure you want to delete this client?');
         if (!confirmed) return;
+        const doubleConfirmed = await notification.confirm('This will permanently delete the client and all associated data. This action cannot be undone. Proceed?');
+        if (!doubleConfirmed) return;
         const success = await api.deleteClient(id);
         if (success) {
             setClients(prev => prev.filter(c => c.id !== id));
@@ -241,8 +243,7 @@ export default function ClientManagement() {
                     fontSize: '0.9rem', fontWeight: '600'
                 }}>{message.text}</div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <p style={{ color: '#999', fontSize: '0.9rem' }}>{clients.length} client{clients.length !== 1 ? 's' : ''} registered</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '30px' }}>
                 <button onClick={openCreate} className="btn" style={{ background: 'var(--role-admin)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Plus size={18} /> Add Client
                 </button>
