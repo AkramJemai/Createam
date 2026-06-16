@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/meetings/{meeting}', [MeetingController::class, 'updateMeeting']);
         Route::delete('/meetings/{meeting}', [MeetingController::class, 'deleteMeeting']);
         Route::post('/meetings/{meeting}/convert', [MeetingController::class, 'convertToProject']);
+        Route::post('/meetings/{meeting}/finalize', [MeetingController::class, 'finalizeProject']);
         Route::post('/jobs/titles', [JobController::class, 'createJobTitle']);
         Route::put('/jobs/titles/{jobTitle}', [JobController::class, 'updateJobTitle']);
         Route::delete('/jobs/titles/{jobTitle}', [JobController::class, 'deleteJobTitle']);

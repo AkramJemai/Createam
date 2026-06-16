@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Pencil, Trash2, Plus, X } from 'lucide-react';
+import { Loader } from 'lucide-react';
 import { useNotification } from '../../hooks/useNotification';
 import * as api from '../../services/api';
 export default function JobManagement({ refreshData, roleColor }) {
     const [titles, setTitles] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editItem, setEditItem] = useState(null);
     const [formName, setFormName] = useState('');
@@ -12,8 +14,10 @@ export default function JobManagement({ refreshData, roleColor }) {
         loadTitles();
     }, []);
     const loadTitles = async () => {
+        setLoading(true);
         const data = await api.getJobTitles();
         setTitles(data || []);
+        setLoading(false);
     };
     const handleOpenModal = (item = null) => {
         setEditItem(item);
@@ -54,7 +58,7 @@ export default function JobManagement({ refreshData, roleColor }) {
                 <div className="flex align-center justify-between" style={{ marginBottom: '30px' }}>
                     <h2 style={{ margin: 0, fontSize: '1.8rem' }}>Job Titles</h2>
                     <button onClick={() => handleOpenModal()} className="btn" style={{ background: roleColor, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Plus size={18} /> New Title
+                        <Plus size={18} /> Add Job Title
                     </button>
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -65,14 +69,22 @@ export default function JobManagement({ refreshData, roleColor }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {titles.length === 0 && (
+                        {loading && (
+                            <tr>
+                                <td colSpan="2" style={{ padding: '40px', textAlign: 'center' }}>
+                                    <Loader size={28} style={{ color: 'var(--primary)', animation: 'spin 1s linear infinite' }} />
+                                    <style>{`@keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }`}</style>
+                                </td>
+                            </tr>
+                        )}
+                        {!loading && titles.length === 0 && (
                             <tr>
                                 <td colSpan="2" style={{ padding: '30px', textAlign: 'center', color: '#999' }}>
                                     No job titles yet. Click "+ New Title" to add one.
                                 </td>
                             </tr>
                         )}
-                        {titles.map(title => (
+                        {!loading && titles.map(title => (
                             <tr key={title.id} style={{ borderBottom: '1px solid var(--border)' }}>
                                 <td style={{ padding: '15px', fontWeight: '600' }}>{title.name}</td>
                                 <td style={{ padding: '15px', textAlign: 'right' }}>

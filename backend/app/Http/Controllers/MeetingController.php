@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 use App\Models\Meeting;
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 class MeetingController extends Controller
 {
@@ -68,5 +69,19 @@ class MeetingController extends Controller
     {
         $meeting->update(['is_project' => true]);
         return response()->json($meeting->load(['chef', 'creator']));
+    }
+    public function finalizeProject(Meeting $meeting)
+    {
+        $admins = User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            Notification::create([
+                'user_id' => $admin->id,
+                'title' => 'Project Ready for Deployment',
+                'message' => "Chef has finalized project: {$meeting->title}. It is ready to deploy.",
+                'type' => 'project_finalized',
+                'data' => ['project_id' => $meeting->id]
+            ]);
+        }
+        return response()->json(['success' => true]);
     }
 }

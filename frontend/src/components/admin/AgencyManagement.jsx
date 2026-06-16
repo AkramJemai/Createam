@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Pencil, RefreshCw, Save } from 'lucide-react';
+import { Trash2, Pencil, Save } from 'lucide-react';
+import LoadingSpinner from '../LoadingSpinner';
 import { useNotification } from '../../hooks/useNotification';
 import * as api from '../../services/api';
 export default function AgencyManagement() {
@@ -109,14 +110,11 @@ export default function AgencyManagement() {
         notification.success('Team member deleted.');
         loadData();
     };
-    if (loading) return <div>Loading agency management...</div>;
+    if (loading) return <LoadingSpinner />;
     return (
         <div className="agency-management">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+            <div style={{ marginBottom: '30px' }}>
                 <h2 style={{ margin: 0 }}>Agency Profile Management</h2>
-                <button onClick={loadData} className="btn" style={{ background: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <RefreshCw size={18} /> Refresh Data
-                </button>
             </div>
             {message.text && (
                 <div style={{ 
@@ -183,7 +181,7 @@ export default function AgencyManagement() {
                                     <input name="label" className="input-field" required />
                                 </div>
                             </div>
-                            <button className="btn full-width">Register Stat</button>
+                            <button className="btn full-width">Add Stat</button>
                         </div>
                     </form>
                 </div>
@@ -211,7 +209,7 @@ export default function AgencyManagement() {
                         ))}
                     </div>
                     <form onSubmit={handleAddTimeline} style={{ background: '#fafafa', padding: '35px', borderRadius: '15px', border: '1px solid #eee' }}>
-                        <h4 style={{ margin: '0 0 25px 0', fontWeight: '800', fontSize: '1rem', color: 'var(--primary)' }}>Log New Milestone</h4>
+                        <h4 style={{ margin: '0 0 25px 0', fontWeight: '800', fontSize: '1rem', color: 'var(--primary)' }}>Add New Milestone</h4>
                         <div className="grid grid-2" style={{ gap: '20px', marginBottom: '20px' }}>
                             <div className="flex-column">
                                 <label className="label">Year</label>
@@ -226,7 +224,7 @@ export default function AgencyManagement() {
                             <label className="label">Full Description</label>
                             <textarea name="description" placeholder="Explain the significance of this milestone..." className="input-field" style={{ minHeight: '100px' }} required />
                         </div>
-                        <button className="btn" style={{ background: 'var(--primary)', padding: '15px 40px' }}>Publish Milestone</button>
+                        <button className="btn" style={{ background: 'var(--primary)', padding: '15px 40px' }}>Add Milestone</button>
                     </form>
                 </div>
             </div>

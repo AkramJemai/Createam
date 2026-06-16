@@ -28,7 +28,7 @@ class ContactController extends Controller
                 'email' => $request->email,
                 'subject' => $request->subject,
                 'message' => $request->message,
-                'status' => 'Received',
+                'status' => 'Pending',
             ]);
             try {
                 $firstName = explode(' ', $contact->full_name)[0];

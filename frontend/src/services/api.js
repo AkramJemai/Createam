@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+import { API_BASE_URL } from './auth';
+
 const inFlightRequests = new Map();
 export const fetchData = async (endpoint, defaultVal = []) => {
     const requestKey = `fetch:${endpoint}`;
@@ -229,6 +230,7 @@ export const createMeeting = (data) => authenticatedPost('meetings', data);
 export const updateMeeting = (id, data) => authenticatedPut(`meetings/${id}`, data);
 export const deleteMeeting = (id) => authenticatedDelete(`meetings/${id}`);
 export const convertMeetingToProject = (id) => authenticatedPost(`meetings/${id}/convert`, {});
+export const finalizeProject = (id) => authenticatedPost(`meetings/${id}/finalize`, {});
 export const getNotifications = () => authenticatedGet('notifications');
 export const markNotificationAsRead = (id) => authenticatedPut(`notifications/${id}/read`);
 export const markAllNotificationsAsRead = () => authenticatedPut('notifications/read-all');

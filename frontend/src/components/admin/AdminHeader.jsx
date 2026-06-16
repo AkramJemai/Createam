@@ -1,6 +1,6 @@
 import React from 'react';
-import { LogOut, Plus } from 'lucide-react';
-export default function AdminHeader({ activeTab, openCreate, showForm, roleColor, handleLogout }) {
+import { LogOut } from 'lucide-react';
+export default function AdminHeader({ activeTab, roleColor, handleLogout }) {
     return (
         <header style={{ marginBottom: '60px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
@@ -29,11 +29,6 @@ export default function AdminHeader({ activeTab, openCreate, showForm, roleColor
                         <LogOut size={16} /> SIGN OUT
                     </div>
                 </button>
-                {activeTab !== 'dashboard' && activeTab !== 'contacts' && activeTab !== 'categories' && activeTab !== 'invites' && activeTab !== 'jobs' && activeTab !== 'tasks' && activeTab !== 'clients' && activeTab !== 'agency' && !showForm && (
-                    <button onClick={openCreate} className="btn" style={{ background: roleColor, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Plus size={18} /> Add New
-                    </button>
-                )}
             </div>
         </header>
     );

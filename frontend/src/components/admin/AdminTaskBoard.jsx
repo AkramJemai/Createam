@@ -4,7 +4,16 @@ import * as api from '../../services/api';
 export default function AdminTaskBoard({ projects, roleColor }) {
     const [selectedProject, setSelectedProject] = useState(null);
     const [tasks, setTasks] = useState([]);
+    const [finalizedIds, setFinalizedIds] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    useEffect(() => {
+        api.getNotifications().then(data => {
+            const ids = (data || [])
+                .filter(n => n.type === 'project_finalized' && n.data?.project_id)
+                .map(n => n.data.project_id);
+            setFinalizedIds(ids);
+        });
+    }, []);
     useEffect(() => {
         if (selectedProject) {
             api.getTasks({ meeting_id: selectedProject.id }).then(data => setTasks(data || []));
@@ -27,16 +36,33 @@ export default function AdminTaskBoard({ projects, roleColor }) {
                             className="stat-card"
                             style={{
                                 cursor: 'pointer',
-                                borderLeft: `8px solid ${roleColor}`,
+                                borderLeft: `8px solid ${finalizedIds.includes(proj.id) ? '#38a169' : roleColor}`,
                                 position: 'relative',
                                 background: '#fff'
                             }}
                         >
+                            {finalizedIds.includes(proj.id) && (
+                                <div title="All tasks done — ready to deploy" style={{
+                                    position: 'absolute',
+                                    top: '16px',
+                                    right: '16px',
+                                    width: '12px',
+                                    height: '12px',
+                                    borderRadius: '50%',
+                                    background: '#38a169',
+                                    boxShadow: '0 0 0 3px #dcfce7'
+                                }} />
+                            )}
                             <h2 className="notranslate" translate="no" style={{ fontSize: '1.2rem', margin: '5px 0 0 0' }}>{proj.title}</h2>
                             <p className="label" style={{ marginTop: '10px', fontSize: '0.7rem' }}>{proj.client_name}</p>
                             <p style={{ fontSize: '0.75rem', color: '#999', marginTop: '4px' }}>
-                                {new Date(proj.meeting_date).toLocaleDateString()}
+                                {new Date(proj.meeting_date).toLocaleDateString('fr-FR')}
                             </p>
+                            {finalizedIds.includes(proj.id) && (
+                                <p style={{ fontSize: '0.7rem', color: '#38a169', fontWeight: '700', marginTop: '8px' }}>
+                                    ✓ Ready to deploy
+                                </p>
+                            )}
                         </div>
                     ))}
                 </div>

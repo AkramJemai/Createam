@@ -3,6 +3,8 @@ import { getClients } from '../services/api';
 import PartnershipModal from '../components/PartnershipModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { MapPin } from 'lucide-react';
+import { storage_API_URL } from '../services/auth';
+const API_STORAGE = storage_API_URL;
 export default function Clients() {
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -76,7 +78,7 @@ export default function Clients() {
                                         <div style={{ aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '30px', borderRadius: '16px', background: '#f0f0f0', overflow: 'hidden' }}>
                                             {client.logo ? (
                                                 <img
-                                                    src={`http://127.0.0.1:8000/storage/${client.logo}`}
+                                                    src={`${API_STORAGE}/${client.logo}`}
                                                     alt={client.name}
                                                     style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center', padding: '14px', boxSizing: 'border-box', opacity: 1 }}
                                                 />

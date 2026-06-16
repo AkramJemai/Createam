@@ -10,6 +10,7 @@ class Meeting extends Model
         'notes',
         'chef_id',
         'created_by',
+        'is_project',
     ];
     public function tasks()
     {

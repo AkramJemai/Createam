@@ -1,8 +1,13 @@
 import React from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
-export default function AdminMeetingsTable({ items, openEdit, handleDelete }) {
+import { Pencil, Trash2, Plus } from 'lucide-react';
+export default function AdminMeetingsTable({ items, openEdit, handleDelete, openCreate, roleColor }) {
     return (
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px', borderBottom: '1px solid #eee' }}>
+                <button onClick={openCreate} className="btn" style={{ background: roleColor, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Plus size={18} /> Add New
+                </button>
+            </div>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                     <tr style={{ background: '#f8f8f8', borderBottom: '1px solid #eee' }}>
@@ -16,8 +21,8 @@ export default function AdminMeetingsTable({ items, openEdit, handleDelete }) {
                     {items.map(meeting => (
                         <tr key={meeting.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                             <td style={{ padding: '15px' }}>
-                                <div style={{ fontSize: '12px' }}>{new Date(meeting.meeting_date).toLocaleDateString()}</div>
-                                <div style={{ fontSize: '10px', color: '#999' }}>{new Date(meeting.meeting_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                <div style={{ fontSize: '12px' }}>{new Date(meeting.meeting_date).toLocaleDateString('fr-FR')}</div>
+                                <div style={{ fontSize: '10px', color: '#999' }}>{new Date(meeting.meeting_date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
                             </td>
                             <td style={{ padding: '15px' }}>
                                 <div style={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>

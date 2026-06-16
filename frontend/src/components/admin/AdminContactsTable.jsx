@@ -19,7 +19,7 @@ export default function AdminContactsTable({ items, handleStatusUpdate, handleDe
                         return (
                             <tr key={contact.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                                 <td style={{ padding: '15px' }}>
-                                    <div style={{ fontSize: '12px' }}>{new Date(contact.created_at).toLocaleDateString()}</div>
+                                    <div style={{ fontSize: '12px' }}>{new Date(contact.created_at).toLocaleDateString('fr-FR')}</div>
                                 </td>
                                 <td style={{ padding: '15px' }}>
                                     <div style={{ fontWeight: '700' }}>{contact.full_name || contact.FullName}</div>

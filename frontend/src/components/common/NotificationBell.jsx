@@ -210,7 +210,7 @@ export default function NotificationBell({ notifications, setNotifications, role
                                         {notif.message}
                                     </p>
                                     <small style={{ color: '#999', fontSize: '0.7rem' }}>
-                                        {new Date(notif.created_at).toLocaleString()}
+                                        {new Date(notif.created_at).toLocaleString('fr-FR')}
                                     </small>
                                 </div>
                             ))
