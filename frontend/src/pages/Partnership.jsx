@@ -68,7 +68,7 @@ export default function Partnership() {
                     setUserLocation({ latitude, longitude });
                     const city = await reverseGeocode(latitude, longitude);
                     setUserCity(city);
-                    const nearby = await getNearbyPartnerships(latitude, longitude);
+                    const nearby = await getNearbyPartnerships(latitude, longitude, 10);
                     setNearbyProjects(nearby || []);
                     setShowNearby(true);
                 }, (error) => {

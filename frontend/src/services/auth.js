@@ -2,9 +2,9 @@ const private_API_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000'
 
 const public_API_URL = "http://197.17.8.75:8000"; 
 
-export const storage_API_URL = public_API_URL + "/storage";
+export const storage_API_URL = private_API_URL + "/storage";
 
-export const API_BASE_URL = public_API_URL + "/api"; 
+export const API_BASE_URL = private_API_URL + "/api"; 
 
 export const login = async (email, password) => {
     const response = await fetch(`${API_BASE_URL}/login`, {
