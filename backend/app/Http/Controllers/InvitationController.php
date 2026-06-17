@@ -15,7 +15,7 @@ class InvitationController extends Controller
         $request->validate([
             'email' => 'required|email',
             'role' => 'required|in:admin,chef,member',
-            'job_title' => 'nullable|string|max:255',
+            'job_title' => 'required|string|max:255',
         ]);
         if (User::where('email', $request->email)->exists()) {
             return response()->json(['message' => 'This email already has an active account.'], 422);
